@@ -1,0 +1,4 @@
+ 
+(1) Fix gcclib include as __eabi_idiv etc. wont work else
+
+(2) Setup kermit and document eetest0 also clean up etc.
