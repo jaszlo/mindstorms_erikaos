@@ -12,7 +12,7 @@ set prefixing all
 set modem none
 
 # should be loaded.
-send /home/jalo/ba_thesis/port/build/start_up.bin
+send ./build/start_up.bin
 connect
 exit
 # Starting address of .text segment of our binary 
