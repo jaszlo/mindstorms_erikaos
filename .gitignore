@@ -47,15 +47,29 @@
 
 # Kernel Module Compile Results
 *.mod*
-*.cmd
 .tmp_versions/
 modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
 
-# builds
+#vscode
+.vscode
 
+#third party
+erika/third_party/wermit/ckcpro.c
+erika/third_party/wermit/wart
+erika/third_party/wermit/wermit
+
+## builds
+# hello world
 hello_world/hello_world
 *.scr
-erika/build
+
+# hello world v2
+hello_world_v2.0/build
+hello_world_v2.0/kermit_upload
+
+# EEtest0 ErikaOS application
+erika/am1808_ee_app/build
+erika/kermit_upload

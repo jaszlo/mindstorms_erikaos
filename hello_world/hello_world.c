@@ -32,7 +32,7 @@ int puts(const char *s)
 }
 
 // entry point
-int start_up(void)
+int hello_world(void)
 {
     puts("Hello World!\n");
     return 1;

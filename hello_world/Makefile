@@ -14,12 +14,12 @@ ARM_FLAGS = -marm -mabi=aapcs-linux -march=armv5te -mno-thumb-interwork -fno-sta
 ENVIROMENT_FLAGS = -fno-common -msoft-float -fno-builtin -ffreestanding -nostdinc
 
 # Name of the entry point lable to look for
-ENTRY = start_up
+ENTRY = hello_world
 
 GET_ENTRY_POINT = $(CC_PREFIX)objdump -d hello_world | grep '<$(ENTRY)>' | sed -n 1p | cut -d' ' -f1
 
 boot.scr: hello_world.bin hello_world.asm
-	echo "loadb 0xC1000000" > boot.cmd
+	echo "fatload mmc 0 0xC1000000 hello_world.bin" > boot.cmd
 	echo "go 0x$(shell grep '<$(ENTRY)>' hello_world.asm | head -n1 | cut -d' ' -f1)" >> boot.cmd
 	@echo Created boot.cmd
 	@echo
