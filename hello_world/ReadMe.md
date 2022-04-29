@@ -7,7 +7,7 @@ Requires sensor port 1 to be used as a a serial port. How this is done is explai
 For compilation two dependencies are required. The `gcc-arm-none-eabi` crosscompiler and the u-boot-util `mkimage`
 Those can be installed (on Ubuntu) as follows.
 ```sh
-chmod u+x configure.sh && ./configure
+chmod u+x configure.sh && ./configure.sh
 ```
 
 To compile the `hello_world.c` simply run `make`. This will create the following files `hello_world.asm hello_world.bin hello_world.o boot.cmd boot.scr` of which only `hello_world.bin` and `boot.scr` are relevant for execution.

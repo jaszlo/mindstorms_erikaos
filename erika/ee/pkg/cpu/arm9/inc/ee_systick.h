@@ -46,15 +46,15 @@
 
 **/
 
-#ifndef	__INCLUDE_CORTEX_MX_SYSTICK_H__
-#define	__INCLUDE_CORTEX_MX_SYSTICK_H__
+#ifndef __INCLUDE_ARM9_SYSTICK_H__
+#define __INCLUDE_ARM9_SYSTICK_H__
 
-#ifdef	__USE_SYSTICK__
+#ifdef __USE_SYSTICK__
 
 /** error value. No errors happened **/
-#define	EE_SYSTICK_NO_ERRORS	0
+#define EE_SYSTICK_NO_ERRORS 0
 /** error value. Wrong funtion arguments values **/
-#define	EE_SYSTICK_ERR_BAD_ARGS	1
+#define EE_SYSTICK_ERR_BAD_ARGS 1
 
 /**
     @brief Start SysTick.
@@ -168,7 +168,7 @@ __INLINE__ EE_UREG __ALWAYS_INLINE__ EE_systick_get_value()
 }
 
 /** Default Clock Frequency */
-#define	EE_DEFAULT_CPU_CLOCK	16000000
+#define EE_DEFAULT_CPU_CLOCK 16000000
 
 /**
     @brief Delay with SysTick .
@@ -177,22 +177,24 @@ __INLINE__ EE_UREG __ALWAYS_INLINE__ EE_systick_get_value()
 
     This function delays the program execution by <tt>usDelay</tt> microseconds.
  */
-__INLINE__ void __ALWAYS_INLINE__ EE_systick_delay_us(EE_UREG usDelay){
-    EE_UREG	const start = EE_systick_get_value();
-#ifdef	EE_CPU_CLOCK
-	EE_UREG ticks = MICROSECONDS_TO_TICKS(usDelay, EE_CPU_CLOCK);
+__INLINE__ void __ALWAYS_INLINE__ EE_systick_delay_us(EE_UREG usDelay)
+{
+  EE_UREG const start = EE_systick_get_value();
+#ifdef EE_CPU_CLOCK
+  EE_UREG ticks = MICROSECONDS_TO_TICKS(usDelay, EE_CPU_CLOCK);
 #else
-	EE_UREG ticks = MICROSECONDS_TO_TICKS(usDelay, EE_DEFAULT_CPU_CLOCK);
+  EE_UREG ticks = MICROSECONDS_TO_TICKS(usDelay, EE_DEFAULT_CPU_CLOCK);
 #endif
-	/* Bound the delay to max one whole run */
-	if ((ticks == NVIC_ST_RELOAD_S) || (ticks > NVIC_ST_RELOAD_M))
-		ticks = NVIC_ST_RELOAD_M - 1;
-	
-	while (((EE_systick_get_value() - start) % NVIC_ST_RELOAD_M)  < ticks){
-		; /* wait */
-	}
+  /* Bound the delay to max one whole run */
+  if ((ticks == NVIC_ST_RELOAD_S) || (ticks > NVIC_ST_RELOAD_M))
+    ticks = NVIC_ST_RELOAD_M - 1;
+
+  while (((EE_systick_get_value() - start) % NVIC_ST_RELOAD_M) < ticks)
+  {
+    ; /* wait */
+  }
 }
 
-#endif	/* __USE_SYSTICK__ */
+#endif /* __USE_SYSTICK__ */
 
-#endif	/* __INCLUDE_CORTEX_MX_SYSTICK_H__ */
+#endif /* __INCLUDE_ARM9_SYSTICK_H__ */

@@ -45,19 +45,26 @@
 	@author Giuseppe Serano
 	@date 2011
 */
-
-#ifndef __INCLUDE_CORTEX_MX_EE_CPU_H__
-#define __INCLUDE_CORTEX_MX_EE_CPU_H__
+#ifndef __INCLUDE_ARM9_EE_CPU_H__
+#define __INCLUDE_ARM9_EE_CPU_H__
 
 #include "eecfg.h"
+
+#ifdef __ENABLE_IO__
+#include "cpu/arm9/debug/io.h"
+#endif 
+
+
+#include "cpu/arm9/inc/ninja_timer.h"
+#include "cpu/arm9/inc/ninja_interrupt.h"
 
 #ifdef __GNU__
 #include "cpu/common/inc/ee_compiler_gcc.h"
 #endif
 
 /* Initial stack offset (in words): Used in multistack. */
-#ifndef CORTEX_MX_INIT_TOS_OFFSET
-#define CORTEX_MX_INIT_TOS_OFFSET 10
+#ifndef ARM9_INIT_TOS_OFFSET
+#define ARM9_INIT_TOS_OFFSET 10
 #endif
 
 /*************************************************************************
@@ -151,12 +158,12 @@ typedef EE_UINT32 EE_UTID;
 #ifdef __MULTI__
 
 /* Top-of-stack of each private stack */
-extern struct EE_TOS EE_cortex_mx_system_tos[];
-//#define	EE_std_system_tos EE_cortex_mx_system_tos
+extern struct EE_TOS EE_arm9_system_tos[];
+//#define	EE_std_system_tos EE_arm9_system_tos
 
 /* Index of the current stack */
-extern EE_UREG EE_cortex_mx_active_tos;
-#define EE_hal_active_tos EE_cortex_mx_active_tos
+extern EE_UREG EE_arm9_active_tos;
+#define EE_hal_active_tos EE_arm9_active_tos
 
 /*extern	EE_UREG EE_pic30_thread_tos[];
 #define	EE_std_thread_tos EE_pic30_thread_tos */
@@ -166,34 +173,34 @@ extern EE_UREG EE_cortex_mx_active_tos;
  Cortex M0 interrupt disabling/enabling
  *********************************************************************/
 
-/* Used to check the value returned by EE_cortex_mx_disableIRQ */
-#define EE_cortex_mx_are_IRQs_enabled(ie) ((ie) ^ 1)
+/* Used to check the value returned by EE_arm9_disableIRQ */
+#define EE_arm9_are_IRQs_enabled(ie) ((ie) ^ 1)
 
 /**
  * Enable interrupts
  */
-__INLINE__ void __ALWAYS_INLINE__ EE_cortex_mx_enableIRQ(void)
+__INLINE__ void __ALWAYS_INLINE__ EE_arm9_enableIRQ(void)
 {
 }
 
 /**
  * Disable interrupts
  */
-__INLINE__ void __ALWAYS_INLINE__ EE_cortex_mx_disableIRQ(void)
+__INLINE__ void __ALWAYS_INLINE__ EE_arm9_disableIRQ(void)
 {
 }
 
 /**
  * Resume interrupts
  */
-__INLINE__ void __ALWAYS_INLINE__ EE_cortex_mx_resumeIRQ(EE_FREG f)
+__INLINE__ void __ALWAYS_INLINE__ EE_arm9_resumeIRQ(EE_FREG f)
 {
 }
 
 /**
  * Suspend interrupts
  */
-__INLINE__ EE_FREG __ALWAYS_INLINE__ EE_cortex_mx_suspendIRQ(void)
+__INLINE__ EE_FREG __ALWAYS_INLINE__ EE_arm9_suspendIRQ(void)
 {
 	return 0;
 }
@@ -201,22 +208,22 @@ __INLINE__ EE_FREG __ALWAYS_INLINE__ EE_cortex_mx_suspendIRQ(void)
 /**
  * Return true (not 0) if IRQs are enabled, 0 (false) if IRQ are disabled.
  */
-__INLINE__ EE_UINT32 __ALWAYS_INLINE__ EE_cortex_mx_get_IRQ_enabled(void)
+__INLINE__ EE_UINT32 __ALWAYS_INLINE__ EE_arm9_get_IRQ_enabled(void)
 {
-	return EE_cortex_mx_are_IRQs_enabled(0);
+	return EE_arm9_are_IRQs_enabled(0);
 }
 
-__INLINE__ EE_TYPEISR2PRIO __ALWAYS_INLINE__ EE_cortex_mx_get_int_prio(void)
+__INLINE__ EE_TYPEISR2PRIO __ALWAYS_INLINE__ EE_arm9_get_int_prio(void)
 {
 	return 0;
 }
 
-__INLINE__ void __ALWAYS_INLINE__ EE_cortex_mx_set_int_prio(
+__INLINE__ void __ALWAYS_INLINE__ EE_arm9_set_int_prio(
 	EE_TYPEISR2PRIO prio)
 {
 }
 
-__INLINE__ EE_TYPEISR2PRIO __ALWAYS_INLINE__ EE_cortex_mx_get_isr_prio(
+__INLINE__ EE_TYPEISR2PRIO __ALWAYS_INLINE__ EE_arm9_get_isr_prio(
 	void)
 {
 	return 0;
@@ -233,25 +240,25 @@ __INLINE__ EE_TYPEISR2PRIO __ALWAYS_INLINE__ EE_cortex_mx_get_isr_prio(
 /** Hal Enable Interrupts */
 __INLINE__ void __ALWAYS_INLINE__ EE_hal_enableIRQ(void)
 {
-	EE_cortex_mx_enableIRQ();
+	EE_arm9_enableIRQ();
 }
 
 /** Hal Disable Interrupts */
 __INLINE__ void __ALWAYS_INLINE__ EE_hal_disableIRQ(void)
 {
-	EE_cortex_mx_disableIRQ();
+	EE_arm9_disableIRQ();
 }
 
 /** Hal Resume Interrupts */
 __INLINE__ void __ALWAYS_INLINE__ EE_hal_resumeIRQ(EE_FREG f)
 {
-	EE_cortex_mx_resumeIRQ(f);
+	EE_arm9_resumeIRQ(f);
 }
 
 /** Hal Suspend Interrupts */
 __INLINE__ EE_FREG __ALWAYS_INLINE__ EE_hal_suspendIRQ(void)
 {
-	return EE_cortex_mx_suspendIRQ();
+	return EE_arm9_suspendIRQ();
 }
 
 /**************************************************************************
@@ -272,16 +279,16 @@ void EE_system_init(void);
 #define EE_ORTI_OTM_ID_SERVICETRACE 2
 
 #ifdef __OO_ORTI_USE_OTM__
-void EE_cortex_mx_send_otm8(EE_UINT8 id, EE_UINT8 data);
-void EE_cortex_mx_send_otm32(EE_UINT8 id, EE_UINT32 data);
+void EE_arm9_send_otm8(EE_UINT8 id, EE_UINT8 data);
+void EE_arm9_send_otm32(EE_UINT8 id, EE_UINT32 data);
 
 #else  /* if __OO_ORTI_USE_OTM__ */
-__INLINE__ void EE_cortex_mx_send_otm8(EE_UINT8 id, EE_UINT8 data)
+__INLINE__ void EE_arm9_send_otm8(EE_UINT8 id, EE_UINT8 data)
 {
 	/* OTM disabled */
 }
 
-__INLINE__ void EE_cortex_mx_send_otm32(EE_UINT8 id, EE_UINT32 data)
+__INLINE__ void EE_arm9_send_otm32(EE_UINT8 id, EE_UINT32 data)
 {
 	/* OTM disabled */
 }
@@ -290,16 +297,16 @@ __INLINE__ void EE_cortex_mx_send_otm32(EE_UINT8 id, EE_UINT32 data)
 #ifdef __OO_ORTI_RUNNINGISR2__
 __INLINE__ void EE_ORTI_send_otm_runningisr2(EE_ORTI_runningisr2_type isr2)
 {
-	EE_cortex_mx_send_otm32(EE_ORTI_OTM_ID_RUNNINGISR2, (EE_UINT32)isr2);
+	EE_arm9_send_otm32(EE_ORTI_OTM_ID_RUNNINGISR2, (EE_UINT32)isr2);
 }
 #endif /* __OO_ORTI_RUNNINGISR2__ */
 
 #ifdef __OO_ORTI_SERVICETRACE__
 __INLINE__ void EE_ORTI_send_otm_servicetrace(EE_UINT8 srv)
 {
-	EE_cortex_mx_send_otm8(EE_ORTI_OTM_ID_SERVICETRACE, srv);
+	EE_arm9_send_otm8(EE_ORTI_OTM_ID_SERVICETRACE, srv);
 }
 
 #endif /* __OO_ORTI_SERVICETRACE__ */
 
-#endif /* __INCLUDE_CORTEX_MX_EE_CPU_H__ */
+#endif /* __INCLUDE_ARM9_EE_CPU_H__ */

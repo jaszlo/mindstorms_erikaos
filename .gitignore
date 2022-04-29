@@ -64,6 +64,7 @@ erika/third_party/wermit/wermit
 ## builds
 # hello world
 hello_world/hello_world
+hello_world/boot.cmd
 *.scr
 
 # hello world v2

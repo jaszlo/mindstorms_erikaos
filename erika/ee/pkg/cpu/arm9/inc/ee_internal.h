@@ -46,8 +46,8 @@
   @date	2012
 */
 
-#ifndef __INCLUDE_CORTEX_MX_INTERNAL_H__
-#define __INCLUDE_CORTEX_MX_INTERNAL_H__
+#ifndef __INCLUDE_ARM9_INTERNAL_H__
+#define __INCLUDE_ARM9_INTERNAL_H__
 
 #include "cpu/arm9/inc/ee_cpu.h"
 
@@ -69,16 +69,16 @@
 
 /* If system is defined I have to initialize it*/
 #if (defined(ENABLE_SYSTEM_TIMER) && defined(EE_SYSTEM_TIMER_DEVICE))
-void EE_cortex_mx_initialize_system_timer(void);
+void EE_arm9_initialize_system_timer(void);
 #else /* ENABLE_SYSTEM_TIMER */
-#define EE_cortex_mx_initialize_system_timer() ((void)0)
+#define EE_arm9_initialize_system_timer() ((void)0)
 #endif /* ENABLE_SYSTEM_TIMER */
 
 __INLINE__ EE_TYPEBOOL __ALWAYS_INLINE__ EE_cpu_startos(void);
 __INLINE__ EE_TYPEBOOL __ALWAYS_INLINE__ EE_cpu_startos(void)
 {
   EE_system_init();
-  EE_cortex_mx_initialize_system_timer();
+  EE_arm9_initialize_system_timer();
   return 0;
 }
 
@@ -86,26 +86,26 @@ __INLINE__ EE_TYPEBOOL __ALWAYS_INLINE__ EE_cpu_startos(void)
    an IRQ and in a task */
 __INLINE__ EE_FREG __ALWAYS_INLINE__ EE_hal_begin_nested_primitive(void)
 {
-  return EE_cortex_mx_suspendIRQ();
+  return EE_arm9_suspendIRQ();
 }
 
 /** Called as _last_ function of a primitive that can be called in
    an IRQ and in a task.  Enable IRQs if they were enabled before entering. */
 __INLINE__ void __ALWAYS_INLINE__ EE_hal_end_nested_primitive(EE_FREG f)
 {
-  EE_cortex_mx_resumeIRQ(f);
+  EE_arm9_resumeIRQ(f);
 }
 
 /* Used to get internal CPU priority. */
 __INLINE__ EE_TYPEISR2PRIO __ALWAYS_INLINE__ EE_hal_get_int_prio(void)
 {
-  return EE_cortex_mx_get_int_prio();
+  return EE_arm9_get_int_prio();
 }
 
 /* Used to set internal CPU priority. */
 __INLINE__ void __ALWAYS_INLINE__ EE_hal_set_int_prio(EE_TYPEISR2PRIO prio)
 {
-  EE_cortex_mx_set_int_prio(prio);
+  EE_arm9_set_int_prio(prio);
 }
 
 /*
@@ -131,10 +131,10 @@ __INLINE__ EE_FREG __ALWAYS_INLINE__ EE_hal_change_int_prio(
 __INLINE__ EE_FREG __ALWAYS_INLINE__ EE_hal_raise_int_prio_if_less(
     EE_TYPEISR2PRIO new_prio, EE_FREG flag)
 {
-  register EE_TYPEISR2PRIO prev_prio = EE_cortex_mx_get_int_prio();
+  register EE_TYPEISR2PRIO prev_prio = EE_arm9_get_int_prio();
   if (((new_prio != 0U) && (prev_prio > new_prio)) || (prev_prio == 0))
   {
-    EE_cortex_mx_set_int_prio(new_prio);
+    EE_arm9_set_int_prio(new_prio);
   }
   return flag;
 }
@@ -146,7 +146,7 @@ __INLINE__ EE_FREG __ALWAYS_INLINE__ EE_hal_raise_int_prio_if_less(
 __INLINE__ EE_BIT __ALWAYS_INLINE__ EE_hal_check_int_prio_if_higher(
     EE_TYPEISR2PRIO new_prio)
 {
-  register EE_TYPEISR2PRIO prev_prio = EE_cortex_mx_get_int_prio();
+  register EE_TYPEISR2PRIO prev_prio = EE_arm9_get_int_prio();
   return ((prev_prio != 0U) && ((prev_prio < new_prio) || (new_prio == 0U)));
 }
 
@@ -181,4 +181,4 @@ NORETURN void EE_hal_terminate_task(EE_TID tid);
 
 #endif /* __OO_BCCx */
 
-#endif /* __INCLUDE_CORTEX_MX_INTERNAL_H__ */
+#endif /* __INCLUDE_ARM9_INTERNAL_H__ */

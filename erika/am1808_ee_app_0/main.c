@@ -1,19 +1,3 @@
-// UART serial port interface to put a char on the screen
-#define UART_THR (volatile char *)(0x01D0C000)
-#define UART_LSR (volatile char *)(0x01D0C014)
-#define EOF -1
-
-int putchar(int c)
-{
-  if (c == '\n')
-    putchar('\r');
-
-  while (!(*UART_LSR & (1 << 5)))
-    ;
-  *UART_THR = c;
-  return c;
-}
-
 #include "ee.h"
 #include "test/assert/inc/ee_assert.h"
 #define TRUE 1
@@ -23,7 +7,8 @@ enum EE_ASSERTIONS
 {
   EE_ASSERT_FIN = 0,
   EE_ASSERT_INIT,
-  EE_ASSERT_DIM
+  EE_ASSERT_DIM,
+  FILLER
 };
 EE_TYPEASSERTVALUE EE_assertions[EE_ASSERT_DIM];
 
@@ -38,6 +23,25 @@ volatile int counter = 0;
  */
 TASK(Task1)
 {
+  char stuff[1];
+  put_string("Hello world!\n");
+  put_string("Iam printing stuff!\n");
+  put_string("Here is an integer in decimal: ");
+  short i = 1337;
+  put_int(i);
+  put_char('\n');
+  put_string("Here is that number in binary: ");
+  set_base(BIN);
+  put_int(i);
+  set_base(DEC);
+  put_char('\n');
+  put_string("And here is a pointer: ");
+  char *ptr = stuff;
+  put_ptr(ptr);
+  put_char('\n');
+  put_string("Here is the bool evaluation of that pointer == NULL: ");
+  put_bool(ptr == NULL);
+  put_char('\n');
 }
 
 /*
@@ -55,18 +59,7 @@ int main(void)
   EE_assert(EE_ASSERT_INIT, TRUE, EE_ASSERT_NIL);
   EE_assert_range(EE_ASSERT_FIN, EE_ASSERT_INIT, EE_ASSERT_INIT);
   result = EE_assert_last();
-  /* Forever loop: background activities (if any) should go here */
-  for (; result == 1;)
-  {
-    while (counter < 1000000)
-    {
-      counter++;
-    }
-
-    // TODO: Maybe display something so you see the program is working (just a char on UART serial port)
-    putchar('X');
-    counter = 0;
-  }
+  ActivateTask(Task1);
   return 0;
 }
 

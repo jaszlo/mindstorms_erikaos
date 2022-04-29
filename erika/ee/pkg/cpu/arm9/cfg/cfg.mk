@@ -46,6 +46,13 @@ ifeq ($(call iseeopt, __ARM9__), yes)
 EE_SRCS += pkg/cpu/arm9/src/ee_utils.c
 EE_SRCS += pkg/cpu/arm9/src/ee_context.c
 
+EE_SRCS += pkg/cpu/arm9/src/ninja_interrupt.c
+EE_SRCS += pkg/cpu/arm9/src/ninja_timer.c
+EE_SRCS += pkg/cpu/arm9/src/ninja_interrupt_handler.S
+
+ifeq ($(call iseeopt, __ENBALE_IO__), yes)
+EE_SRCS += pkg/cpu/arm9/debug/io.c
+endif
 
 ifeq ($(call iseeopt, ENABLE_SYSTEM_TIMER), yes)
 EE_SRCS += pkg/cpu/arm9/src/ee_system_timer.c

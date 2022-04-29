@@ -83,6 +83,9 @@ OPT_INCLUDE = $(foreach d,$(INCLUDE_PATH),$(addprefix -I,$(call native_path,$d))
 OPT_CC += -Os
 OPT_CC += -marm -mabi=aapcs-linux -march=armv5te -mno-thumb-interwork -fno-stack-protector
 OPT_CC += -fno-common -msoft-float -fno-builtin -ffreestanding -nostdinc
+# Fixes this: obj/main.o uses 32-bit enums yet the output is to use variable-size enums; use of enum values across objects may fail
+#	and this: libgcc.a(_udivmoddi4.o) uses variable-size enums yet the output is to use 32-bit enums; use of enum values across objects may fail
+OPT_CC += -fshort-enums 
 #OPT_CC += -Wall -Wextra -Wstrict-prototypes -Werror
 
 # Compile and assemble, but do not link 
@@ -98,9 +101,9 @@ OPT_CC += $(CFLAGS)
 #	Add LibGCC
 #	Set where in memory the textsegment starts
 #	Set the entry point lable
+export LIB_GCC_LINK = -L$(CG_LIB_DIR) -lgcc
 OPT_LINK += -Ttext 0xC1000030
-OPT_LINK += -L$(CG_LIB_DIR) -lgcc
-OPT_LINK += -e main -g -nostdlib
+OPT_LINK += -e start_up -g
 OPT_LINK += --section-start=start=0xC1000000
 
 # Specific option from the application makefile

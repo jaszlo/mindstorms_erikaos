@@ -6,9 +6,11 @@ export TARGET_NAME = am1808_ee_app
 # Make sure ./configure.sh was called because wermit needs to be compiled for target "deploy" to work
 WERMIT = third_party/wermit/wermit
 BINARY = am1808_ee_app/build/$(TARGET_NAME).bin
+ELF = am1808_ee_app/build/$(TARGET_NAME).elf
 
 build:
 	@$(MAKE) -C  am1808_ee_app clean all
+	@arm-none-eabi-objdump -d $(ELF) > app.asm
 
 # Deploy binary to ev3 via kermit
 deploy:

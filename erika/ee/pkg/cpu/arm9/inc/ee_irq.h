@@ -47,8 +47,8 @@
    @date 2011
 */
 
-#ifndef __INCLUDE_CORTEX_MX_IRQ_H__
-#define __INCLUDE_CORTEX_MX_IRQ_H__
+#ifndef __INCLUDE_ARM9_IRQ_H__
+#define __INCLUDE_ARM9_IRQ_H__
 
 #ifdef __CORTEX_MX__
 #define EE_ISR_UNMASKED 0x00000000
@@ -167,4 +167,4 @@ extern EE_UREG EE_cortex_mx_change_context_active;
 /* Standard Macro to declare an ISR (2) */
 #define ISR(f) ISR2(f)
 
-#endif /* __INCLUDE_CORTEX_MX_IRQ_H__ */
+#endif /* __INCLUDE_ARM9_IRQ_H__ */

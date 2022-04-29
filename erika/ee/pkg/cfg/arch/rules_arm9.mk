@@ -141,8 +141,7 @@ $(TARGET_NAME).$(CG_BIN_EXTENSION): $(TARGET_NAME).$(CG_OUT_EXTENSION)
 
 $(TARGET_NAME).$(CG_OUT_EXTENSION): $(OBJS) $(LINKDEP) $(LIBDEP) 
 	@echo "LD";
-	@echo "$(EE_LINK) $(COMPUTED_OPT_LINK) -o $@ $(OBJS) $(OPT_LIBS)"
-	$(QUIET)$(EE_LINK) $(COMPUTED_OPT_LINK) -o $@ $(OBJS) $(OPT_LIBS) \
+	$(QUIET)$(EE_LINK) $(COMPUTED_OPT_LINK) -o $@ $(OBJS) $(OPT_LIBS) $(LIB_GCC_LINK) \
 
 	
 ### Object file creation ###

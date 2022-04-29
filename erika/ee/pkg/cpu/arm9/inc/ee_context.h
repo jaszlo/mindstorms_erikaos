@@ -7,7 +7,7 @@
  *
  * ERIKA Enterprise is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General Public License
- * version 2 as published by the Free Software Foundation, 
+ * version 2 as published by the Free Software Foundation,
  * (with a special exception described below).
  *
  * Linking this code statically or dynamically with other modules is
@@ -38,16 +38,16 @@
  * Boston, MA 02110-1301 USA.
  * ###*E*### */
 
-/** 
-	@file ee_internal.h
-	@brief Derived from cpu/common/inc/ee_internal.h
-	@author Gianluca Franchino
-	@author Giuseppe Serano
-	@date 2011
-*/  
+/**
+    @file ee_internal.h
+    @brief Derived from cpu/common/inc/ee_internal.h
+    @author Gianluca Franchino
+    @author Giuseppe Serano
+    @date 2011
+*/
 
-#ifndef __INCLUDE_CPU_CORTEX_MX_EE_CONTEXT__
-#define __INCLUDE_CPU_CORTEX_MX_EE_CONTEXT__
+#ifndef __INCLUDE_CPU_ARM9_EE_CONTEXT__
+#define __INCLUDE_CPU_ARM9_EE_CONTEXT__
 
 /*
  * Instructions
@@ -86,7 +86,7 @@ void EE_cortex_mx_change_context(EE_TID tid);
 
       Please notice that the "goto begin" is actually a recursive call to
       EE_std_change_context_multi(), but in this way there is no stack growing.
-      
+
       Please notice also that 'tid' must NOT be saved onto the stack before
       switching stacks, otherwise when switching from another stack back to the
       current one, you would overwrite its value.
@@ -99,12 +99,11 @@ void EE_cortex_mx_change_context(EE_TID tid);
 
 /* Call a the body of a task */
 #if defined(__OO_BCC1__) || defined(__OO_BCC2__) || \
- defined(__OO_ECC1__) || defined(__OO_ECC2__)
-#define EE_call_task_body(tid)  EE_oo_thread_stub()
+    defined(__OO_ECC1__) || defined(__OO_ECC2__)
+#define EE_call_task_body(tid) EE_oo_thread_stub()
 #else
-#define EE_call_task_body(tid)  (((void (*)(void))EE_hal_thread_body[tid])())
+#define EE_call_task_body(tid) (((void (*)(void))EE_hal_thread_body[tid])())
 #endif
-
 
 /* Launch a new task, possibly switching to a different stack, clean up the task
  * after it ends, and call the scheduler (and switch to other tasks/stacks)
@@ -112,17 +111,14 @@ void EE_cortex_mx_change_context(EE_TID tid);
  * change the current stack before returning if the scheduler asks for it. */
 __DECLARE_INLINE__ void EE_hal_ready2stacked(EE_TID tid);
 
-
 /* Launch a new task on the current stack, clean up the task after it ends, and
  * call the scheduler.  Return the next task to launch, which is "marked as
  * stacked" if there is no new task to launch. */
 EE_TID EE_std_run_task_code(EE_TID tid);
 
-
 /*
  * Inline implementations
  */
-
 
 #ifdef __MONO__
 
@@ -134,7 +130,6 @@ EE_TID EE_std_run_task_code(EE_TID tid);
 #define EE_std_need_context_change(tid) ((tid) >= 0)
 
 #endif /* __MONO__ */
-
 
 #ifdef __MULTI__
 
@@ -150,27 +145,23 @@ __INLINE__ void __ALWAYS_INLINE__ EE_hal_stkchange(EE_TID tid)
 
 #endif /* __MULTI__ */
 
-
 /* The functions below should work for both the monostack and multistack
  * versions of the kernel, thanks to the macros defined above.  In the mono
  * version, all the stack-related stuff is ignored. */
-
 
 __INLINE__ void __ALWAYS_INLINE__ EE_hal_ready2stacked(EE_TID tid)
 {
     EE_cortex_mx_change_context(tid);
 }
 
-
 __INLINE__ void __ALWAYS_INLINE__ EE_hal_endcycle_ready(EE_TID tid)
 {
     EE_std_endcycle_next_tid = tid;
 }
-
 
 __INLINE__ void __ALWAYS_INLINE__ EE_hal_endcycle_stacked(EE_TID tid)
 {
     EE_std_endcycle_next_tid = EE_std_mark_tid_stacked(tid);
 }
 
-#endif /* __INCLUDE_CPU_CORTEX_MX_EE_CONTEXT__ */
+#endif /* __INCLUDE_CPU_ARM9_EE_CONTEXT__ */

@@ -7,7 +7,7 @@
  *
  * ERIKA Enterprise is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General Public License
- * version 2 as published by the Free Software Foundation, 
+ * version 2 as published by the Free Software Foundation,
  * (with a special exception described below).
  *
  * Linking this code statically or dynamically with other modules is
@@ -38,35 +38,35 @@
  * Boston, MA 02110-1301 USA.
  * ###*E*### */
 
- /** 
-	
-	@file	ee_irq_cng_cont.h
-	@brief	Function active the context change interrupt
-	@author	Gianluca Franchino
-	@author	Giuseppe Serano
-	@date	2012
-*/ 
+/**
 
-#ifndef __INCLUDE_CORTEX_MX_IRQ_CNG_CONTEXT_H__
-#define __INCLUDE_CORTEX_MX_IRQ_CNG_CONTEXT_H__
+   @file	ee_irq_cng_cont.h
+   @brief	Function active the context change interrupt
+   @author	Gianluca Franchino
+   @author	Giuseppe Serano
+   @date	2012
+*/
+
+#ifndef __INCLUDE_ARM9_IRQ_CNG_CONTEXT_H__
+#define __INCLUDE_ARM9_IRQ_CNG_CONTEXT_H__
 
 #ifdef __IAR__
 #include "cpu/common/inc/ee_compiler_iar.h"
-#else	/* __IAR__ */
+#else /* __IAR__ */
 #ifdef __CCS__
 #include "cpu/common/inc/ee_compiler_ccs.h"
-#else	/* __CCS__ */
+#else /* __CCS__ */
 #ifdef __KEIL__
 #include "cpu/common/inc/ee_compiler_keil.h"
-#else	/* __KEIL__ */
+#else /* __KEIL__ */
 #ifdef __GNU__
 #include "cpu/common/inc/ee_compiler_gcc.h"
-#else	/* __GNU__ */
+#else /* __GNU__ */
 #error Unsupported compiler
-#endif	/* !__GNU__ */
-#endif	/* !__KEIL__ */
-#endif	/* !__CCS__ */
-#endif	/* !__IAR__ */
+#endif /* !__GNU__ */
+#endif /* !__KEIL__ */
+#endif /* !__CCS__ */
+#endif /* !__IAR__ */
 
 /* Implemented in ee_<compiler>_change_context_isr.s */
 extern void EE_switch_context(void);
@@ -76,5 +76,4 @@ __INLINE__ void __ALWAYS_INLINE__ EE_cortex_mx_IRQ_active_change_context(void)
 	EE_switch_context();
 }
 
-#endif /* __INCLUDE_CORTEX_MX_IRQ_CNG_CONTEXT_H__ */
-
+#endif /* __INCLUDE_ARM9_IRQ_CNG_CONTEXT_H__ */
