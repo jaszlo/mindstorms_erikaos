@@ -12,7 +12,6 @@ include $(EEBASE)/pkg/cfg/dir.mk 	# sets name of dirs
 include $(PKGBASE)/cfg/verbose.mk   # specifies some output variables and so on
 include $(PKGBASE)/cfg/compiler.mk 	# sets which cc_*.mk file is used to set compiler settings
 
-
 ifneq ($(ONLY_LIBS), TRUE)
 
 ifneq ($(call iseeopt, __BIN_DISTR), yes)

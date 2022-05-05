@@ -50,16 +50,6 @@
 #ifndef __INCLUDE_ARM9_IRQ_H__
 #define __INCLUDE_ARM9_IRQ_H__
 
-#ifdef __CORTEX_MX__
-#define EE_ISR_UNMASKED 0x00000000
-#define EE_ISR_PRI_1 0x00000006U
-#define EE_ISR_PRI_2 0x00000005U
-#define EE_ISR_PRI_3 0x00000004U
-#define EE_ISR_PRI_4 0x00000003U
-#define EE_ISR_PRI_5 0x00000002U
-#define EE_ISR_PRI_6 0x00000001U
-#endif /* __CORTEX_M4__ */
-
 #define EE_std_change_context(x) ((void)0)
 
 /* Use angled parenthesis to include the main "ee_internal.h" */
@@ -68,43 +58,17 @@
 #include "cpu/arm9/inc/ee_context.h"
 #include "cpu/common/inc/ee_irqstub.h"
 
-#ifdef __ALLOW_NESTED_IRQ__
-
-extern struct EE_TOS EE_cortex_mx_IRQ_tos;
-
+#ifdef __ALLOW_NESTED_IRQ__ // Not supported with current irq handler
+/*extern struct EE_TOS EE_cortex_mx_IRQ_tos;
 #define EE_std_enableIRQ_nested() EE_cortex_mx_enableIRQ()
 #define EE_std_disableIRQ_nested() EE_cortex_mx_disableIRQ()
-
-#else /* else __ALLOW_NESTED_IRQ__*/
-
+#else /* else __ALLOW_NESTED_IRQ__
 #define EE_std_enableIRQ_nested() ((void)0)
-#define EE_std_disableIRQ_nested() ((void)0)
-
+#define EE_std_disableIRQ_nested() ((void)0)*/
 #endif /* end __ALLOW_NESTED_IRQ__*/
 
 #if defined(__MULTI__) && defined(__IRQ_STACK_NEEDED__)
-
-extern void EE_cortex_mx_change_IRQ_stack(void);
-extern void EE_cortex_mx_change_IRQ_stack_back(void);
-
-/*save the stack pointer*/ /*Load new stack pointer*/
-#define EE_cortex_mx_change_stack()          \
-	do                                       \
-	{                                        \
-		if (EE_IRQ_nesting_level == 1)       \
-		{                                    \
-			EE_cortex_mx_change_IRQ_stack(); \
-		}                                    \
-	} while (0)
-
-#define EE_cortex_mx_stack_back() \
-	EE_cortex_mx_change_IRQ_stack_back()
-
-#else /* else __MULTI__ && __IRQ_STACK_NEEDED__*/
-
-#define EE_cortex_mx_change_stack() ((void)0)
-#define EE_cortex_mx_stack_back() ((void)0)
-
+// Not supported yet
 #endif /* end __MULTI__ && __IRQ_STACK_NEEDED__*/
 
 #define EE_ISR2_prestub(void)                                   \

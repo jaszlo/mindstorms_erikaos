@@ -51,7 +51,7 @@
 #include "eecfg.h"
 
 #ifdef __ENABLE_IO__
-#include "cpu/arm9/debug/io.h"
+#include "cpu/arm9/inc/debug_io.h"
 #endif 
 
 

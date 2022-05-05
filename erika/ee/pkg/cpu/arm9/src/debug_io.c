@@ -1,4 +1,4 @@
-#include "cpu/arm9/debug/io.h"
+#include "cpu/arm9/inc/debug_io.h"
 
 unsigned int base = 10;
 unsigned int *base_ptr = &base;

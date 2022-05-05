@@ -1,7 +1,7 @@
 #include "ee.h"
 #include "test/assert/inc/ee_assert.h"
 #include "ee_irq.h"
-#include "cpu/arm9/debug/io.h"
+#include "cpu/arm9/inc/debug_io.h"
 volatile unsigned int flag = 0;
 #define TIMER_LOAD_VALUE 0x100000
 
