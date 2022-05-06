@@ -160,7 +160,9 @@ extern "C"
 #endif
 
 #ifdef __CORTEX_MX__
-#include "cpu/cortex_mx/inc/ee_cpu.h"
+#ifndef __ARM9__
+//#include "cpu/cortex_mx/inc/ee_cpu.h"
+#endif
 #endif
 
 #ifdef __RX200__
@@ -265,7 +267,9 @@ extern "C"
 
 /* ST */
 #if (defined(__STM32__)) && (defined(__STM32F4xx__))
+#ifndef __ARM9__
 #include "mcu/st_stm32_stm32f4xx/inc/ee_mcu.h"
+#endif
 #endif
 
 /* NORDIC */

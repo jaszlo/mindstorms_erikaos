@@ -1,184 +1,132 @@
-/* ###*B*###
- * ERIKA Enterprise - a tiny RTOS for small microcontrollers
- *
- * Copyright (C) 2002-2011  Evidence Srl
- *
- * This file is part of ERIKA Enterprise.
- *
- * ERIKA Enterprise is free software; you can redistribute it
- * and/or modify it under the terms of the GNU General Public License
- * version 2 as published by the Free Software Foundation,
- * (with a special exception described below).
- *
- * Linking this code statically or dynamically with other modules is
- * making a combined work based on this code.  Thus, the terms and
- * conditions of the GNU General Public License cover the whole
- * combination.
- *
- * As a special exception, the copyright holders of this library give you
- * permission to link this code with independent modules to produce an
- * executable, regardless of the license terms of these independent
- * modules, and to copy and distribute the resulting executable under
- * terms of your choice, provided that you also meet, for each linked
- * independent module, the terms and conditions of the license of that
- * module.  An independent module is a module which is not derived from
- * or based on this library.  If you modify this code, you may extend
- * this exception to your version of the code, but you are not
- * obligated to do so.  If you do not wish to do so, delete this
- * exception statement from your version.
- *
- * ERIKA Enterprise is distributed in the hope that it will be
- * useful, but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License version 2 for more details.
- *
- * You should have received a copy of the GNU General Public License
- * version 2 along with ERIKA Enterprise; if not, write to the
- * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
- * Boston, MA 02110-1301 USA.
- * ###*E*### */
-
-/**
-  @file	ee_internal.h
-  @brief	Derived from cpu/pic30/inc/ee_internal.h
-  @author	Gianluca Franchino
-  @author	Giuseppe Serano
-  @date	2012
-*/
-
 #ifndef __INCLUDE_ARM9_INTERNAL_H__
 #define __INCLUDE_ARM9_INTERNAL_H__
 
 #include "cpu/arm9/inc/ee_cpu.h"
+#include "cpu/arm9/inc/internal/interrupt.h"
+#include "cpu/arm9/inc/internal/cpsr.h"
+extern EE_TID EE_std_endcycle_next_tid;
 
-/*************************************************************************
- Functions
- *************************************************************************/
+extern EE_UREG EE_hal_endcycle_next_thread;
+extern EE_UREG EE_hal_endcycle_next_tos;
 
-/*
- * Generic Primitives
- */
 
-#include "cpu/common/inc/ee_primitives.h"
 
-/*************************************************************************
-                            System startup
- *************************************************************************/
-
-#define OO_CPU_HAS_STARTOS_ROUTINE
-
-/* If system is defined I have to initialize it*/
-#if (defined(ENABLE_SYSTEM_TIMER) && defined(EE_SYSTEM_TIMER_DEVICE))
-void EE_arm9_initialize_system_timer(void);
-#else /* ENABLE_SYSTEM_TIMER */
-#define EE_arm9_initialize_system_timer() ((void)0)
-#endif /* ENABLE_SYSTEM_TIMER */
-
-__INLINE__ EE_TYPEBOOL __ALWAYS_INLINE__ EE_cpu_startos(void);
-__INLINE__ EE_TYPEBOOL __ALWAYS_INLINE__ EE_cpu_startos(void)
+extern EE_UREG EE_IRQ_nesting_level;
+// Get current IRQ level of nesting
+__INLINE__ EE_UREG __ALWAYS_INLINE__ EE_hal_get_IRQ_nesting_level(void)
 {
-  EE_system_init();
-  EE_arm9_initialize_system_timer();
-  return 0;
+  return EE_IRQ_nesting_level;
 }
 
-/** Called as _first_ function of a primitive that can be called in
-   an IRQ and in a task */
+// Save the current status of the interrupt and disable them 
 __INLINE__ EE_FREG __ALWAYS_INLINE__ EE_hal_begin_nested_primitive(void)
 {
-  return EE_arm9_suspendIRQ();
+  EE_FREG stat = cpsr_status();
+  irq_disable();
+  return stat;
 }
 
-/** Called as _last_ function of a primitive that can be called in
-   an IRQ and in a task.  Enable IRQs if they were enabled before entering. */
+// Restore the status saved before with the begin function
 __INLINE__ void __ALWAYS_INLINE__ EE_hal_end_nested_primitive(EE_FREG f)
 {
-  EE_arm9_resumeIRQ(f);
+  // Done implicitly as long as no IRQ nesting!
+  //cpsr_write(f);
+  //irq_enable();
 }
 
-/* Used to get internal CPU priority. */
-__INLINE__ EE_TYPEISR2PRIO __ALWAYS_INLINE__ EE_hal_get_int_prio(void)
+// Prototypes for MONO and MULTI of the following ifdef
+static void EE_hal_ready2stacked(EE_TID thread);
+static void EE_hal_endcycle_ready(EE_TID thread);
+static void EE_hal_endcycle_stacked(EE_TID thread);
+
+#ifdef __MONO__
+void EE_arm9_hal_ready2stacked(EE_ADDR thread_addr); // in Context.S
+// Starts new thread
+__INLINE__ void __ALWAYS_INLINE__ EE_hal_ready2stacked(EE_TID thread)
 {
-  return EE_arm9_get_int_prio();
+  #ifdef __DEBUG__ 
+  put_string("Starting Task "); put_num(thread + 1); put_string("\n");
+  #endif
+  EE_arm9_hal_ready2stacked(EE_hal_thread_body[thread]);
+  #ifdef __DEBUG__ 
+  put_string("Finished Task "); put_num(thread + 1); put_string("\n");
+  #endif
 }
-
-/* Used to set internal CPU priority. */
-__INLINE__ void __ALWAYS_INLINE__ EE_hal_set_int_prio(EE_TYPEISR2PRIO prio)
+// Called at end of thread
+__INLINE__ void __ALWAYS_INLINE__ EE_hal_endcycle_ready(EE_TID thread)
 {
-  EE_arm9_set_int_prio(prio);
+  EE_hal_endcycle_next_thread = (EE_UREG)EE_hal_thread_body[thread];
 }
 
-/*
- * Used to change internal CPU priority and return a status flag mask.
- *
- * Note:	EE_FREG param flag and return value needed only for according to
- * 		HAL interface.
- */
-__INLINE__ EE_FREG __ALWAYS_INLINE__ EE_hal_change_int_prio(
-    EE_TYPEISR2PRIO prio, EE_FREG flag)
+// Called at the end of a thread instance 
+__INLINE__ void __ALWAYS_INLINE__ EE_hal_endcycle_stacked(EE_TID thread)
 {
-  EE_hal_set_int_prio(prio);
-  return flag;
+  EE_hal_endcycle_next_thread = 0;
+  /* TID is useless */
 }
 
-/*
- * Used to raise internal CPU interrupt priority if param new_prio is greater
- * than actual priority.
- *
- * Note:	EE_FREG param flag and return value needed only for according to
- * 		HAL interface.
- */
-__INLINE__ EE_FREG __ALWAYS_INLINE__ EE_hal_raise_int_prio_if_less(
-    EE_TYPEISR2PRIO new_prio, EE_FREG flag)
+#else // __MULTI__
+
+// Starts new thread
+void EE_arm9_hal_ready2stacked(EE_ADDR thread_addr, EE_UREG tos_index); // in Context.S
+__INLINE__ void __ALWAYS_INLINE__ EE_hal_ready2stacked(EE_TID thread)
 {
-  register EE_TYPEISR2PRIO prev_prio = EE_arm9_get_int_prio();
-  if (((new_prio != 0U) && (prev_prio > new_prio)) || (prev_prio == 0))
-  {
-    EE_arm9_set_int_prio(new_prio);
-  }
-  return flag;
+  EE_arm9_hal_ready2stacked(EE_hal_thread_body[thread], EE_arm9_thread_tos[thread + 1]);
 }
 
-/*
- * Used to check internal CPU interrupt priority if param new_prio is greater
- * than actual priority.
- */
-__INLINE__ EE_BIT __ALWAYS_INLINE__ EE_hal_check_int_prio_if_higher(
-    EE_TYPEISR2PRIO new_prio)
+// Called at end of thread
+__INLINE__ void __ALWAYS_INLINE__ EE_hal_endcycle_ready(EE_TID thread)
 {
-  register EE_TYPEISR2PRIO prev_prio = EE_arm9_get_int_prio();
-  return ((prev_prio != 0U) && ((prev_prio < new_prio) || (new_prio == 0U)));
+  EE_hal_endcycle_next_tos = EE_arm9_thread_tos[thread + 1];
+  EE_hal_endcycle_next_thread = (EE_UREG)EE_hal_thread_body[thread];
 }
 
-/*
- * Context Handling
- */
+// Called at the end of a thread instance 
+__INLINE__ void __ALWAYS_INLINE__ EE_hal_endcycle_stacked(EE_TID thread)
+{
+  EE_hal_endcycle_next_tos = EE_arm7_thread_tos[thread+1];
+  EE_hal_endcycle_next_thread = 0;
+}
 
-#include "cpu/arm9/inc/ee_context.h"
+// Called to change the active stack, typically inside blocking primitives 
+// there is no mono version for this primitive.
+void EE_arm9_hal_stkchange(EE_UREG, EE_UREG tos_index); /* in ASM */
+__INLINE__ void __ALWAYS_INLINE__ EE_hal_stkchange(EE_TID thread)
+{
+  EE_arm9_hal_stkchange(0, EE_arm9_thread_tos[thread + 1]);
+}
+#endif
 
-/* Launch a new task on the current stack, clean up the task after it ends, and
- * call the scheduler.  Return the next task to launch, which is "marked as
- * stacked" if there is no new task to launch. */
-EE_TID EE_std_run_task_code(EE_TID tid);
-
-/* typically called at the end of an interrupt */
-#define EE_hal_IRQ_stacked EE_hal_endcycle_stacked
-#define EE_hal_IRQ_ready EE_hal_endcycle_ready
-
-/*
+/* 
  * OO TerminateTask related stuffs
  */
 
 #if defined(__OO_BCC1__) || defined(__OO_BCC2__) || defined(__OO_ECC1__) || defined(__OO_ECC2__)
 
+void EE_arm9_terminate_savestk(EE_ADDR sp, EE_ADDR realbody);
+void EE_arm9_terminate_task(EE_ADDR sp) NORETURN;
+
+
 /** Save the context and call the body of the task `tid'.  Implemented in
  * assembly */
-void EE_hal_terminate_savestk(EE_TID tid);
+__INLINE__ void __ALWAYS_INLINE__ EE_hal_terminate_savestk(EE_TID t)
+{
+  #ifdef __DEBUG__ 
+  put_string("Switching to task context\n");
+  #endif
+  EE_arm9_terminate_savestk(&EE_terminate_data[t], (EE_ADDR)EE_terminate_real_th_body[t]);
+  #ifdef __DEBUG__ 
+  put_string("Switching from task to old context\n");
+  #endif
+}
 
 /** Restore the context saved by EE_hal_terminate_savestk() for the task `tid' and
  * return from EE_hal_terminate_savestk().  Implemented in assembly */
-NORETURN void EE_hal_terminate_task(EE_TID tid);
+__INLINE__ void __ALWAYS_INLINE__ EE_hal_terminate_task(EE_TID t)
+{
+  EE_arm9_terminate_task(&EE_terminate_data[t]);
+}
 
-#endif /* __OO_BCCx */
+#endif
 
 #endif /* __INCLUDE_ARM9_INTERNAL_H__ */

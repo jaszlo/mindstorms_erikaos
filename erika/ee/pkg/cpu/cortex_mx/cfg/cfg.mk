@@ -43,6 +43,7 @@
 ##         2011 Giuseppe Serano
 
 ifeq ($(call iseeopt, __CORTEX_MX__), yes)
+ifneq ($(call iseeopt, __ARM9__), yes)
 EE_SRCS += pkg/cpu/cortex_mx/src/ee_utils.c
 EE_SRCS += pkg/cpu/cortex_mx/src/ee_context.c
 
@@ -140,4 +141,5 @@ endif
 
 endif	# __IRQ_STACK_NEEDED__
 
+endif   # __ARM9__
 endif	# __CORTEX_MX__

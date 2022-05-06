@@ -102,10 +102,13 @@ OPT_CC += $(CFLAGS)
 #	Set where in memory the textsegment starts
 #	Set the entry point lable
 export LIB_GCC_LINK = -L$(CG_LIB_DIR) -lgcc
-OPT_LINK += -Ttext 0xC1000030
-OPT_LINK += -e start_up -g
-OPT_LINK += --section-start=start=0xC1000000
+# Not really necessary as we use GO instruction from U-Boot to start programm but
+# Linker requries entry point and if not set is not happy
+OPT_LINK += -e reset_handler -g
+OPT_LINK += -T $(EEBASE)/pkg/cfg/arch/cc_arm9_gnu.ld 
 
+# Create mapfile for debugging
+OPT_LINK += --cref -Map=test.map
 # Specific option from the application makefile
 OPT_LINK += $(LDFLAGS)
 
@@ -142,9 +145,3 @@ else # NODEPS
 DEPENDENCY_OPT = -MMD -MF $(subst .o,.d_tmp,$@) -MP -MT $@
 make-depend = mv $3_tmp $3
 endif # NODEPS
-
-
-
-
-test:
-	@echo $(OPT_LINK)

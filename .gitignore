@@ -71,6 +71,12 @@ hello_world/boot.cmd
 hello_world_v2.0/build
 hello_world_v2.0/kermit_upload
 
-# EEtest0 ErikaOS application
-erika/am1808_ee_app/build
+# ErikaOS applications
+erika/am1808_ee_app*/build
 erika/kermit_upload
+
+# RT-druid
+erika/third_party/rt_druid/configuration/org.eclipse.core.runtime/
+erika/third_party/rt_druid/configuration/org.eclipse.osgi/
+erika/third_party/rt_druid/evidence/workspace/
+erika/third_party/rt_druid/configuration/*.log

@@ -85,7 +85,9 @@ extern "C"
 #endif /* defined __PPCE200Z7__ || defined __PPCE200ZX__ */
 
 #ifdef __CORTEX_MX__
+#ifndef __ARM9__
 #include "cpu/cortex_mx/inc/ee_cpu.h"
+#endif
 #endif
 
 #ifdef __X86__
@@ -163,7 +165,9 @@ extern "C"
 #endif
 
 #ifdef __CORTEX_MX__
-#include "cpu/cortex_mx/inc/ee_irq.h"
+#ifndef __ARM9__
+//#include "cpu/cortex_mx/inc/ee_irq.h"
+#endif
 #endif
 
 #ifdef __CORTEX_RX__

@@ -181,6 +181,9 @@ endif
 #include $(EEBASE)/pkg/cfg/arch/cc_cortex_m0_iar.mk
 #endif
 
+ifeq ($(call iseeopt, __CORTEX_MX__), yes)
+ifneq ($(call iseeopt, __ARM9__), yes)
+
 ifeq ($(call iseeopt, __CORTEX_M0__), yes)
 ifeq ($(call iseeopt, __IAR__), yes)
 include $(EEBASE)/pkg/cfg/arch/cc_cortex_m0_iar.mk
@@ -219,6 +222,8 @@ endif	# __GNU__
 endif	# !__KEIL__
 endif	# !__CCS__
 endif	# __CORTEX_M4__
+endif   # __CORTEX_MX__
+endif   # __ARM9__
 
 ifeq ($(call iseeopt, __RX200__), yes)
 include $(EEBASE)/pkg/cfg/arch/cc_rx200_ccrx.mk

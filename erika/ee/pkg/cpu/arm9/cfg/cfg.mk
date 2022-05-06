@@ -43,19 +43,20 @@
 ##         2011 Giuseppe Serano
 
 ifeq ($(call iseeopt, __ARM9__), yes)
-EE_SRCS += pkg/cpu/arm9/src/ee_utils.c
-EE_SRCS += pkg/cpu/arm9/src/ee_context.c
 
-EE_SRCS += pkg/cpu/arm9/src/ninja_interrupt.c
-EE_SRCS += pkg/cpu/arm9/src/ninja_timer.c
-EE_SRCS += pkg/cpu/arm9/src/ninja_interrupt_handler.S
+EE_SRCS += pkg/cpu/arm9/src/internal/interrupt.c
+EE_SRCS += pkg/cpu/arm9/src/internal/interrupt_handler.S
+EE_SRCS += pkg/cpu/arm9/src/internal/timer.c
+EE_SRCS += pkg/cpu/arm9/src/internal/cpsr.c
+
+EE_SRCS += pkg/cpu/arm9/src/ee_init.c
+EE_SRCS += pkg/cpu/arm9/src/ee_internal.c
+EE_SRCS += pkg/cpu/arm9/src/ee_context.S
+EE_SRCS += pkg/cpu/arm9/src/ee_terminate.S
+EE_SRCS += pkg/cpu/arm9/src/ee_reset.S
 
 ifeq ($(call iseeopt, __ENABLE_IO__), yes)
-EE_SRCS += pkg/cpu/arm9/src/debug_io.c
-endif
-
-ifeq ($(call iseeopt, ENABLE_SYSTEM_TIMER), yes)
-EE_SRCS += pkg/cpu/arm9/src/ee_system_timer.c
+EE_SRCS += pkg/cpu/arm9/src/internal/debug_io.c
 endif
 
 endif

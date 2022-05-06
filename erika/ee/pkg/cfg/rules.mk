@@ -348,18 +348,20 @@ endif
 ## CORTEX MX - Texas Instruments Code Composer Studio v4 TMS 470 or IAR
 ## compilers toolchains under windows
 ##########################################################################
-ifeq ($(call iseeopt, __CORTEX_MX__), yes)
+ifeq ($(call iseeopt, __CORTEX_MX__), yes) 
+ifneq ($(call iseeopt, __ARM9__), yes)
 include $(EEBASE)/pkg/cfg/arch/rules_cortex_generic.mk
 endif
+endif
+
 
 ##
 ## CORTEX RX - Texas Instruments Code Composer Studio
 ## compilers toolchains under windows
 ##########################################################################
 ifeq ($(call iseeopt, __CORTEX_RX__), yes)
-include $(EEBASE)/pkg/cfg/arch/rules_cortex_generic.mk
+  include $(EEBASE)/pkg/cfg/arch/rules_cortex_generic.mk
 endif
-
 ##
 ## x86 clang/gcc
 ##########################################################################

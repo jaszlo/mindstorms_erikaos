@@ -139,7 +139,9 @@ extern "C"
 
 /* ARM */
 #ifdef __CORTEX_MX__
+#ifndef __ARM9__
 #include "cpu/cortex_mx/inc/ee_internal.h"
+#endif
 #endif
 
 /* Renesas RX200 */
