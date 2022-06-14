@@ -1,4 +1,3 @@
-#!/usr/bin/kermit
 # Serial port setup. 
 set line /dev/ttyUSB0
 set speed 115200

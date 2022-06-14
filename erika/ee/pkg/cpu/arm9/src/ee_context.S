@@ -1,5 +1,6 @@
 #include "eecfg.h"
-#include "cpu/arm9/inc/internal/modes.h"
+
+#include "cpu/arm9/inc/modes.h"
 
 // Export
 .global	EE_arm9_hal_ready2stacked
@@ -11,11 +12,43 @@
 .extern	EE_arm9_active_tos
 #endif
 .extern	EE_thread_end_instance
+.extern	EE_std_run_task_code
 .extern irq_enable
 .extern irq_disable
 
 			
-.text
+.section .text
+
+/**
+ * void EE_std_change_context( EE_TID tid )
+ * 	r0 = tid
+ *
+ *  Pseudo code for EE_std_change_context in multistack environment:
+ *  begin:
+ *    tos_index = EE_std_thread_tos[tid+1];
+ *    if is_not_the_current_stack(tos_index) {
+ *       save_caller_saved_registers();
+ *       switch_stacks(tos_index);
+ *       restore_caller_saved_registers();
+ *    }
+ *    if (is_not_marked_stacked(tid)) {
+ *       tid = EE_std_run_task_code(tid);
+ *        goto begin;
+ *    }
+ *
+ *  Please notice that the "goto begin" is actually a recursive call to
+ *  EE_std_change_context_multi(), but in this way there is no stack growing.
+ *
+ *  For processors where the return address is saved in a register, that
+ *  register must be saved in the stack too.
+ *
+ *  switch_stacks() should also update EE_hal_active_tos.
+ */
+	.global	EE_std_change_context
+EE_std_change_context:
+	
+
+
 #ifdef __MULTI__
 // 
 // This code is called when we have to change the thread stack
@@ -23,8 +56,7 @@
 // will be unchanged!!!
 //
 EE_arm9_change_tos:	
-	// if tos_index == EE_arm9_active_tos then we do not have to
-	// switch stack
+	// If tos_index == EE_arm9_active_tos then we do not have to switch stack
 	LDR	r2, =EE_arm9_active_tos
 	LDR	r3, [r2]
 
@@ -64,7 +96,7 @@ EE_arm9_change_tos:
 	LDR	sp, [r3]
 	
 	//
-	// Update arm7_active_tos (= tos_index)
+	// Update arm9_active_tos (= tos_index)
 	//
 	// remember that r2=&EE_arm9_active_tos
 	STR	r1, [r2]
@@ -111,47 +143,35 @@ EE_arm9_hal_stkchange:
 // Typically called into a generic primitive to implement preemption.
 //
 EE_arm9_hal_ready2stacked:	
-	// we have to save LR into the stack (APCS standard)
+	// We have to save LR into the stack (APCS standard)
  	STMFD	sp!, {lr}
 1:	
 #ifdef __MULTI__
-	// (eventually) switch to the TOS of the new thread
+	// Switch Stack if required to stack of new Task
 	BL	EE_arm9_change_tos
 #endif
-	
-	//
-	// Before calling the new thread we have to enable interrupts. 
-	// Note that only arithmetic flag field of CPSR can be set
-	// with immediate value (we use LR because we saved its content)
-	//
-	//MOV	lr, #Mode_SYS
- 	//MSR	cpsr_c, lr
+
 	bl irq_enable
 
-	// jump to the preempter thread (r0 = first parameter)
+	// Jump to the preempter thread (r0 = first parameter)
 	MOV	lr, pc
 	BX	r0
 
-	// NOTE: we have to disable interrupts here before calling
-	// EE_thread_end_instance() because it is a primitive
-	//MOV	lr, #Mode_SYS | I_bit
- 	//MSR	cpsr_c, lr
+	// EE_thread_end_instance() requires interrupts to be disabled
 	bl irq_disable
 		
-	// call the scheduler 
+	// Call to Scheduler 
 	BL	EE_thread_end_instance
-
-	// note that interrupts are disabled here
 	
-	//
-	// if EE_hal_endcycle_next_thread == 0
-	//   then wake up the preempted thread
-	//   (EE_arm7_hal_endcycle_stacked executed)
-	//
-	// if EE_hal_endcycle_next_thread != 0
-	//   then activate a new thread
-	//   (EE_arm7_hal_endcycle_ready executed)
-	//
+	/**
+	 * if EE_hal_endcycle_next_thread == 0
+	 *   then wake up the preempted thread
+	 *   (EE_arm9_hal_endcycle_stacked executed)
+	 *
+	 * if EE_hal_endcycle_next_thread != 0
+	 *   then activate a new thread
+	 *   (EE_arm9_hal_endcycle_ready executed)
+	 */
 #ifdef __MULTI__
 	LDR	r2, =EE_hal_endcycle_next_tos
 	LDR	r1, [r2]
@@ -160,18 +180,13 @@ EE_arm9_hal_ready2stacked:
 	LDR	r2, =EE_hal_endcycle_next_thread
 	LDR	r0, [r2]
 
+	// Check if next_thread was actually set if not redo from start
 	CMP	r0, #0
 	BNE	1b
-
-	// (eventually) switch to the TOS of the preempted thread
+	// Switch Stack if required to stack of preempted Task
 #ifdef __MULTI__
 	BL	EE_arm9_change_tos
 #endif
-	// Keep interrupts disabled !!!
-	// we always return into a primitive or into an IRQ handler...
-	
-	//
-	// return to the interrupted thread
-	//
+	// Keep interrupts disabled as this will return into a primitiv that requires it or IRQ handler
 	LDMFD	sp!, {lr}
 	BX	lr

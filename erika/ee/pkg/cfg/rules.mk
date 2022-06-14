@@ -146,11 +146,12 @@ endif # __USE_DEMOBOARD__
 
 
 ##
-## H8/300 - gcc under GNU/Linux
+## ARM9 - gcc under GNU/Linux
 ##########################################################################
 ifeq ($(call iseeopt, __ARM9__), yes) 
   include $(EEBASE)/pkg/cfg/arch/rules_arm9.mk
 endif 
+
 
 ##
 ## H8/300 - gcc under GNU/Linux

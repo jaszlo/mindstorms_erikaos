@@ -36,12 +36,14 @@ include $(PKGBASE)/cfg/cfg.mk
 # Check if MCU is specified for AM1808
 ifeq ($(call iseeopt, __AM1808__), yes)
 ARM9_MCU_MODEL = AM1808
-
+ifeq ($(call iseeopt, __VERSATILEPB__), yes)
+ARM9_MCU_MODEL = VERSATILEPB
 # No MCU model
 ifndef ARM9_MCU_MODEL
 $(error No known MCU model found in EE_OPT)
 endif
-endif
+endif #__VERSATILEPB__
+endif #__AM1808__
 
 # Might be used later when actuall boot code is present
 # Boot code containing _start should stay outside of the library in

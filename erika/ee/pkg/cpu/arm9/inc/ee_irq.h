@@ -3,13 +3,19 @@
 
 /* Use angled parenthesis to include the main "ee_internal.h" */
 #include "cpu/arm9/inc/ee_cpu.h"
-#include "cpu/arm9/inc/internal/interrupt.h"
 
-#include "cpu/common/inc/ee_context.h"
-#include "cpu/common/inc/ee_irqstub.h"
+#ifdef __AM1808__
+#include "mcu/am1808/inc/interrupt.h"
+#endif /*__AM1808__ */
+#ifdef __VERSATILEPB__
+#include "mcu/versatilepb/inc/interrupt.h"
+#endif /* __VERSATILEPB__ */
 
 #ifdef __ALLOW_NESTED_IRQ__ // Not supported with current irq handler
 #endif /* end __ALLOW_NESTED_IRQ__*/
+
+
+
 
 #if defined(__MULTI__) && defined(__IRQ_STACK_NEEDED__)
 // Not supported yet
@@ -24,9 +30,14 @@
 	 * (3) Handle the new IRQ.
 	 */
 
+#ifdef __AM1808__							
 #define EE_ISR2_poststub(void) 					\
-	irq_clear_status(irq_get_current_num()); 	\
-  	/*irq_enable()*/;							\
+	irq_clear_status(irq_get_current_num()); 	
+#endif 	/* __AM1808__ */
+#ifdef __VERSATILEPB__
+#define EE_ISR2_poststub(void) 
+#endif /* __VERSATILEPB__ */						
+  	/*irq_enable()*/;							
 	/** TODO for nested IRQ
 	 * 	(1) Restore previous IRQ priority if there is one
 	 *  (2) Set the restored IRQ priority in hardware

@@ -3,55 +3,62 @@
 # This can be changed and will be the name of the resulting binary
 export TARGET_NAME = am1808_ee_app
 
-ifndef EE_APP
-EE_APP=compile_test
-endif
 
 # Make sure ./configure.sh was called because wermit needs to be compiled for target "deploy" to work
+BINARY = apps/`cat .build_helper`/build/$(TARGET_NAME).bin
 WERMIT = third_party/wermit/wermit
-BINARY = am1808_ee_app_$(EE_APP)/build/$(TARGET_NAME).bin
-ELF = am1808_ee_app_$(EE_APP)/build/$(TARGET_NAME).elf
+
+%:
+	@echo $@ > .build_helper
+	@$(MAKE) -C  apps/$@ all
+	@mkdir -p disassembly
+	@arm-none-eabi-objdump -D apps/$@/build/$(TARGET_NAME).elf > disassembly/all.asm
+	@arm-none-eabi-objdump -d apps/$@/build/$(TARGET_NAME).elf > disassembly/code.asm
+	
 
 
-all: $(EE_APP)
+qemu_run:
+	$(if $(APP),,$(error APP must best set like "make qemu APP=<app_name>"))
+	@echo $(APP) > .gdb_helper
+	@$(MAKE) -C qemu_apps/$(APP) all
+	@mkdir -p disassembly
+	@arm-none-eabi-objdump -D qemu_apps/$(APP)/build/$(TARGET_NAME).elf > disassembly/all.asm
+	@arm-none-eabi-objdump -d qemu_apps/$(APP)/build/$(TARGET_NAME).elf > disassembly/code.asm
+	@qemu-system-arm -M versatilepb -m 128M -nographic -kernel qemu_apps/$(APP)/build/$(TARGET_NAME).bin
 
-compile_test:
-	@$(MAKE) -C  am1808_ee_app_$@ all
-	@arm-none-eabi-objdump -D $(ELF) > all.asm
-	@arm-none-eabi-objdump -d $(ELF) > code.asm
-	@echo Basic compilation worked
-	@echo
-
-coop_schedule:
-	@$(MAKE) -C  am1808_ee_app_$@ all
-	@arm-none-eabi-objdump -D $(ELF) > all.asm
-	@arm-none-eabi-objdump -d $(ELF) > code.asm
-	@echo Compilation of cooperative schedule application worked
-	@echo
+qemu:
+	$(if $(APP),,$(error APP must best set like "make qemu APP=<app_name>"))
+	@echo $(APP) > .gdb_helper
+	@$(MAKE) -C qemu_apps/$(APP) all
+	@mkdir -p disassembly
+	@arm-none-eabi-objdump -D qemu_apps/$(APP)/build/$(TARGET_NAME).elf > disassembly/all.asm
+	@arm-none-eabi-objdump -d qemu_apps/$(APP)/build/$(TARGET_NAME).elf > disassembly/code.asm
+	@qemu-system-arm -M versatilepb -m 128M -nographic -kernel qemu_apps/$(APP)/build/$(TARGET_NAME).bin -s -S
 
 
-isr2_test:
-	@$(MAKE) -C  am1808_ee_app_$@ all
-	@arm-none-eabi-objdump -D $(ELF) > all.asm
-	@arm-none-eabi-objdump -d $(ELF) > code.asm
-	@echo Compilation of interrupt application worked
-	@echo
+gdb:
+	@echo target remote localhost:1234 > .gdb_init
+	@arm-none-eabi-gdb qemu_apps/`cat .gdb_helper`/build/$(TARGET_NAME).elf --command=.gdb_init
+
+kill:
+	@echo Terminating qemu...
+	@kill $(shell ps -aux | grep qemu | head -n 2 | tail -n -1 | awk '{print $$2;exit}')
+
+
 
 # Deploy binary to ev3 via kermit
 deploy:
-	@echo Creating kermit script
-	@echo Executing script...
+	@if [ -f ".build_helper" ]; then echo Deploying `cat .build_helper` application; else echo No binary to deploy found && exit; fi
+	@echo Creating kermit script...
 	@cat kermit_upload_stub > kermit_upload
-	@echo send $(BINARY) >> kermit_upload
+	@echo send apps/`cat .build_helper`/build/$(TARGET_NAME).bin >> kermit_upload
 	@echo connect >> kermit_upload
 	@echo exit >> kermit_upload
+	@echo Executing script...
 	$(WERMIT) kermit_upload
 
-
-
-
 clean:
-	rm -rf am1808_ee_app*/build kermit_upload *.asm
-
+	@rm -rf apps/*/build kermit_upload disassembly .build_helper qemu_apps/*/build
+	@echo Removing build and debug files...
 
 .PHONY: clean, build deploy

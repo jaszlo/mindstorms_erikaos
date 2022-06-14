@@ -45,5 +45,5 @@ INPUTS[${#INPUTS[*]}]="$OUTPUT"
 OUTPUT="$1"
 shift
 done
-	
+
 exec java -jar "$LAUNCHER_JAR" -data "$OUTPUT/workspace" -application com.eu.evidence.rtdruid.oil.standalone.writer --inputFile "${INPUTS[@]}" --outputDir "$OUTPUT"

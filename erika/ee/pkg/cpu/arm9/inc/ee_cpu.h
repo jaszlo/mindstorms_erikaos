@@ -4,12 +4,6 @@
 #include "eecfg.h"
 
 
-#ifdef __ENABLE_IO__
-#include "cpu/arm9/inc/internal/debug_io.h"
-#endif
-
-#include "cpu/arm9/inc/internal/timer.h"
-#include "cpu/arm9/inc/internal/interrupt.h"
 
 #ifdef __GNU__
 #include "cpu/common/inc/ee_compiler_gcc.h"
@@ -49,6 +43,7 @@ typedef EE_UREG EE_TYPEBOOL;
 
 /* ISR Priority representation type */
 typedef EE_UREG EE_TYPEISR2PRIO;
+typedef EE_UREG EE_TYPESTATUS;
 
 /* Thread IDs */
 typedef EE_INT32 EE_TID;
@@ -76,19 +71,38 @@ static void EE_hal_endcycle_ready(EE_TID thread);
 /******************************************************************************
  CPU Peripherals
  ******************************************************************************/
-
-#include "cpu/arm9/inc/internal/timer.h"
-#include "cpu/arm9/inc/internal/interrupt.h"
+#include "cpu/arm9/inc/ee_io.h"
+#ifdef __AM1808__
+#include "mcu/am1808/inc/timer.h"
+#include "mcu/am1808/inc/interrupt.h"
+#include "mcu/am1808/inc/put_char.h"
+#endif /* __AM1808__ */
+#ifdef __VERSATILEPB__
+#include "mcu/versatilepb/inc/timer.h"
+#include "mcu/versatilepb/inc/interrupt.h"
+#include "mcu/versatilepb/inc/put_char.h"
+#endif /* __VERSATILEPB__ */
 
 // Timer
+#ifdef __AM1808__
 #define EE_timer_init(p, c) timer_init(p, c)
+#endif
+#ifdef __VERSATILEPB__
+#define EE_timer_init(p) timer_init(p)
+#endif
 #define EE_timer_start() timer_start()
 #define EE_timer_stop() timer_stop()
-#define EE_timer_clear_irq_flags() timer_clear_irq_flags
+#define EE_timer_clear_irq_flags() timer_clear_irq_flags()
 
 // IRQ
 #define EE_irq_init() irq_init()
+#ifdef __AM1808__
 #define EE_irq_register(num, func) irq_register(num, func)
+#endif
+#ifdef __VERSATILEPB__
+#define EE_irq_register(func) irq_register(func)
+#endif
+
 #define EE_irq_unregister(num) irq_unregister(num)
 #define EE_irq_clear_status(num)  irq_clear_status(num)
 #define EE_irq_enable() irq_enable()

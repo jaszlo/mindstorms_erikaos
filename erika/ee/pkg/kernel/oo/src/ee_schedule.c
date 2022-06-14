@@ -58,7 +58,7 @@
 
 #ifndef __PRIVATE_SCHEDULE__
 
-StatusType EE_oo_Schedule(void)
+StatusType  __attribute__((optimize("O0"))) EE_oo_Schedule(void)
 {
   register EE_TID current, rq;
   /* Error Value */

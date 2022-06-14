@@ -72,9 +72,12 @@ hello_world_v2.0/build
 hello_world_v2.0/kermit_upload
 
 # ErikaOS applications
-erika/am1808_ee_app*/build
+erika/apps/*/build
+erika/qemu_apps/*/build
 erika/kermit_upload
-
+erika/.build_helper
+erika/.gdb_init
+erika/.gdb_helper
 # RT-druid
 erika/third_party/rt_druid/configuration/org.eclipse.core.runtime/
 erika/third_party/rt_druid/configuration/org.eclipse.osgi/

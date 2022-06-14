@@ -2,16 +2,21 @@
 #define __INCLUDE_ARM9_INTERNAL_H__
 
 #include "cpu/arm9/inc/ee_cpu.h"
-#include "cpu/arm9/inc/internal/interrupt.h"
-#include "cpu/arm9/inc/internal/cpsr.h"
+#ifdef __AM1808__
+#include "mcu/am1808/inc/interrupt.h"
+#endif
+#ifdef __VERSATILEPB__
+#include "mcu/versatilepb/inc/interrupt.h"
+#endif
+#include "cpu/arm9/inc/cpsr.h"
+
 extern EE_TID EE_std_endcycle_next_tid;
 
 extern EE_UREG EE_hal_endcycle_next_thread;
 extern EE_UREG EE_hal_endcycle_next_tos;
 
-
-
 extern EE_UREG EE_IRQ_nesting_level;
+
 // Get current IRQ level of nesting
 __INLINE__ EE_UREG __ALWAYS_INLINE__ EE_hal_get_IRQ_nesting_level(void)
 {
@@ -111,13 +116,7 @@ void EE_arm9_terminate_task(EE_ADDR sp) NORETURN;
  * assembly */
 __INLINE__ void __ALWAYS_INLINE__ EE_hal_terminate_savestk(EE_TID t)
 {
-  #ifdef __DEBUG__ 
-  put_string("Switching to task context\n");
-  #endif
   EE_arm9_terminate_savestk(&EE_terminate_data[t], (EE_ADDR)EE_terminate_real_th_body[t]);
-  #ifdef __DEBUG__ 
-  put_string("Switching from task to old context\n");
-  #endif
 }
 
 /** Restore the context saved by EE_hal_terminate_savestk() for the task `tid' and
@@ -127,6 +126,6 @@ __INLINE__ void __ALWAYS_INLINE__ EE_hal_terminate_task(EE_TID t)
   EE_arm9_terminate_task(&EE_terminate_data[t]);
 }
 
-#endif
+#endif /* defined(__OO_BCC1__) || defined(__OO_BCC2__) || defined(__OO_ECC1__) || defined(__OO_ECC2__) */
 
 #endif /* __INCLUDE_ARM9_INTERNAL_H__ */

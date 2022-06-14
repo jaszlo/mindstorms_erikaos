@@ -81,7 +81,7 @@ OPT_INCLUDE = $(foreach d,$(INCLUDE_PATH),$(addprefix -I,$(call native_path,$d))
 # Compiler flags for warnings
 #
 OPT_CC += -Os
-OPT_CC += -marm -mabi=aapcs-linux -march=armv5te -mno-thumb-interwork -fno-stack-protector
+OPT_CC += -marm -mabi=aapcs-linux -march=armv5te -mcpu=arm926ej-s -mno-thumb-interwork -fno-stack-protector
 OPT_CC += -fno-common -msoft-float -fno-builtin -ffreestanding -nostdinc
 # Fixes this: obj/main.o uses 32-bit enums yet the output is to use variable-size enums; use of enum values across objects may fail
 #	and this: libgcc.a(_udivmoddi4.o) uses variable-size enums yet the output is to use 32-bit enums; use of enum values across objects may fail
@@ -90,6 +90,9 @@ OPT_CC += -fshort-enums
 
 # Compile and assemble, but do not link 
 OPT_CC += -c 
+
+# Debug info
+OPT_CC += -g
 
 # Specific option from the application makefile. Not used here probably
 OPT_CC += $(CFLAGS)
@@ -105,7 +108,16 @@ export LIB_GCC_LINK = -L$(CG_LIB_DIR) -lgcc
 # Not really necessary as we use GO instruction from U-Boot to start programm but
 # Linker requries entry point and if not set is not happy
 OPT_LINK += -e reset_handler -g
-OPT_LINK += -T $(EEBASE)/pkg/cfg/arch/cc_arm9_gnu.ld 
+
+OPT_LINK += --gc-sections
+
+ifeq ($(call iseeopt, __AM1808__), yes)
+OPT_LINK += -T $(EEBASE)/pkg/mcu/am1808/cfg/am1808_linker.ld
+else
+ifeq ($(call iseeopt, __VERSATILEPB__), yes)
+OPT_LINK += -T $(EEBASE)/pkg/mcu/versatilepb/cfg/versatilepb_linker.ld
+endif # __VERSATILEPB__
+endif # __AM1808__
 
 # Create mapfile for debugging
 OPT_LINK += --cref -Map=test.map
@@ -116,7 +128,8 @@ OPT_LINK += $(LDFLAGS)
 # Option for arm-none-eabi-ar to handle libee.a 
 OPT_AR = r
 
-OPT_ASM = -march=armv5te -mno-thumb-interwork -c
+# Subset of compiler Opts
+OPT_ASM = -march=armv5te -mcpu=arm926ej-s -mno-thumb-interwork -g -c 
 
 ################
 #
