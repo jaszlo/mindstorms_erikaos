@@ -1,8 +1,12 @@
+#define ASM_INC
+#include "cpu/arm9/inc/redefine.h"
 // Import
 .globl system_init
 .globl copy_vectors
 // Export
 .globl vectors_start
+.globl reset_handler
+.globl reboot
 
 vectors_start:
     LDR PC, reset_handler_addr
@@ -25,9 +29,6 @@ fiq_handler_addr:            .word irq_handler
 vectors_end:
 
 
-// Export
-.globl reset_handler
-.globl reboot
 reset_handler:
     LDR SP, =USR_STACK_TOP          // Set Stack; defined in ee/pkg/mcu/<am1808/versatilepb>/cfg/cfg.mk
     BL copy_vectors                 // Initialize Exception Vector table
@@ -40,6 +41,7 @@ reset_handler:
     BIC  r0, #0x1f                  // Clear mode bits
     ORR  r0, #0x13                  // Select SVC mode
     MSR  cpsr, r0                   // Enter SVC mode
+
 
     bl system_init                  // Goes to system_init which will then goto main after setting up ErikaOS
 

@@ -1,0 +1,57 @@
+CPU test_application {
+
+	OS EE {
+
+		EE_OPT = "DEBUG";
+		EE_OPT = "__ARM9__";
+		EE_OPT = "__VERSATILEPB__";
+		EE_OPT = "__GNU__";
+
+		// Just to set inner values
+		CPU_DATA = CORTEX_MX {
+			MODEL = M4;
+			APP_SRC = "main.c";
+			COMPILER_TYPE = GNU;
+			MULTI_STACK = TRUE;
+			
+		};
+
+
+		STATUS = EXTENDED;
+		STARTUPHOOK = FALSE;
+		ERRORHOOK = FALSE;
+		SHUTDOWNHOOK = FALSE;
+		PRETASKHOOK = FALSE;
+		POSTTASKHOOK = FALSE;
+		USEGETSERVICEID = FALSE;
+		USEPARAMETERACCESS = FALSE;
+		USERESSCHEDULER = FALSE;
+		KERNEL_TYPE = BCC1;
+		EE_OPT = "__OO_STARTOS_OLD__"; // No autosar compliance
+
+	};
+
+	TASK Task1 {
+		PRIORITY = 0x01;  
+		AUTOSTART = FALSE;
+		ACTIVATION = 1;    /* only one pending activation */
+		STACK = PRIVATE {
+			SYS_SIZE = 1024;
+		};
+	};
+
+	TASK Task2 {
+		PRIORITY = 0x02;  
+		AUTOSTART = FALSE;
+		ACTIVATION = 1;    /* only one pending activation */
+		STACK = PRIVATE {
+			SYS_SIZE = 1024;
+		};
+	};
+
+	ISR timer_handler {
+		CATEGORY = 2;
+		ENTRY = "TIMER"; // For the arm9 port "TIMER" is the only valid value here.
+		PRIORITY = 1;
+    };
+};

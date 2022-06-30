@@ -13,10 +13,10 @@ extern int main();
 
 void reboot(void);
 
-void undef_handler(void)          { put_string("UNDEF EXC\n");for (;;); }
-void swi_handler(void)            { put_string("SWI EXC\n");for (;;); }
-void prefetch_abort_handler(void) { put_string("PREFETCH ABORT EXC\n");for (;;); }
-void data_abort_handler(void)     { put_string("DATA ABORT EXC\n");for (;;); }
+void undef_handler(void)          { put_string("UNDEF EXCEPTION\n");for (;;); }
+void swi_handler(void)            { put_string("SWI EXCEPTION\n");for (;;); }
+void prefetch_abort_handler(void) { put_string("PREFETCH ABORT EXCEPTION\n");for (;;); }
+void data_abort_handler(void)     { put_string("DATA ABORT EXCEPTION\n");for (;;); }
 
 
 #include <stdint.h>
@@ -67,7 +67,7 @@ void copy_vectors(void)
 }
 
 void system_init(void) {
-    // As we might  use it and want to spar the user the call just do it here.
+   // Timer should be stoped when cofiguring. Most likely unnecesarry
     EE_timer_stop();
 
     // Initialize AINTC
@@ -80,6 +80,7 @@ void system_init(void) {
             // TOOD: set ISR prio to EE_ARM9_TIMER_ISR_PRI
             // EE_irq_set_prio(IRQ_NUM_T64P0_TINT34, EE_ARM9_TIMER_ISR_PRI) ?
         #endif /* EE_ARM9_TIMER_ISR */
+        // TODO: Support more Interrupts!
     #endif /* __AM1808__ */
 
     // "Start ErikaOS"
@@ -88,9 +89,12 @@ void system_init(void) {
     // Should only be here as long as developing
     
     // Only reboot on real hardware for faster debugging
-    #ifdef __AM1808__
+    #ifdef __REBOOT__
     reboot();
     #endif
-    put_string("End of Program!\n");
+    
+    // Only for debugging 
+    // put_string("\t\tEnd of Program!\n");
     while(1);
+    // Undefined behaviour as we go back to reset_handler but behind valid instruction!
 }

@@ -1,192 +1,155 @@
-#include "eecfg.h"
-
-#include "cpu/arm9/inc/modes.h"
+#define ASM_INC
+#include "cpu/arm9/inc/redefine.h"
 
 // Export
-.global	EE_arm9_hal_ready2stacked
+.globl EE_std_change_context
 
-#ifdef __MULTI__
-.global EE_arm9_hal_stkchange
 // Import
-.extern	EE_arm9_system_tos
-.extern	EE_arm9_active_tos
-#endif
-.extern	EE_thread_end_instance
-.extern	EE_std_run_task_code
-.extern irq_enable
-.extern irq_disable
-
+.globl EE_arm9_system_tos
+.globl EE_arm9_active_tos
+.globl EE_arm9_get_thread_tos
 			
 .section .text
 
-/**
- * void EE_std_change_context( EE_TID tid )
- * 	r0 = tid
- *
- *  Pseudo code for EE_std_change_context in multistack environment:
- *  begin:
- *    tos_index = EE_std_thread_tos[tid+1];
- *    if is_not_the_current_stack(tos_index) {
- *       save_caller_saved_registers();
- *       switch_stacks(tos_index);
- *       restore_caller_saved_registers();
- *    }
- *    if (is_not_marked_stacked(tid)) {
- *       tid = EE_std_run_task_code(tid);
- *        goto begin;
- *    }
- *
- *  Please notice that the "goto begin" is actually a recursive call to
- *  EE_std_change_context_multi(), but in this way there is no stack growing.
- *
- *  For processors where the return address is saved in a register, that
- *  register must be saved in the stack too.
- *
- *  switch_stacks() should also update EE_hal_active_tos.
- */
-	.global	EE_std_change_context
+// TODO: ATM we schedule back to the start of the function after TerminteTask but we want to go back to where Schedule was called
+
+
+#ifdef __MULTI__
+/* Pseudo code for EE_std_change_context_multi():
+     begin:
+      (1) tos_index = EE_std_thread_tos[tid+1];
+      (2) if is_not_the_current_stack(tos_index) {
+          (3) save_callee_saved_registers();
+          (4) switch_stacks(tos_index);
+          (5) restore_callee_saved_registers();
+      }
+      (6) if (is_not_marked_stacked(tid)) {
+		  (6.5) mark_stack(tid) [Not documented but required]
+          (7)   tid = EE_std_run_task_code(tid);
+		  (7.5) if (tid >= 0) {
+          (8) 		goto begin;
+          		}
+      	}
+
+      Please notice that the "goto begin" is actually a recursive call to
+      EE_std_change_context_multi(), but in this way there is no stack growing.
+
+      Please notice also that 'tid' must NOT be saved onto the stack before
+      switching stacks, otherwise when switching from another stack back to the
+      current one, you would overwrite its value.
+
+      For processors where the return address is saved in a register, that
+      register must be saved in the stack too.
+
+      switch_stacks() should also update EE_hal_active_tos.
+
+	void EE_std_change_context(EE_TID tid);
+		r0 = tid
+*/
 EE_std_change_context:
+
+	// Save LR before its "destroyed" by function calls for later
+	PUSH	{lr}
+/** (1)  tos_index = EE_std_thread_tos[tid+1]; **/
+	// Save tid to r1
+	MOV 	r1, r0		
+
+	// Get tos_index for tid ro r0 as tid is also in r1
+	BL		EE_arm9_get_thread_tos	
+
+	// Get active tos and write it to r3
+	LDR		r2, =EE_arm9_active_tos
+	LDR		r3, [r2]
+
+	// r3 = EE_arm9_active_tos
+	// r2 = &EE_arm9_active_tos
+	// r1 = tid
+	// r0 = tos_index
+
+/** (2) if is_not_the_current_stack(tos_index) { **/
+	CMP		r3, r0
+
+	// If tos_index == active_tos we want to skip (3), (4) and (5)
+	BEQ		skip_stack_change
+
 	
-
-
-#ifdef __MULTI__
-// 
-// This code is called when we have to change the thread stack
-// NOTE: r1 MUST contain tos_index, while r0 (the thread address)
-// will be unchanged!!!
-//
-EE_arm9_change_tos:	
-	// If tos_index == EE_arm9_active_tos then we do not have to switch stack
-	LDR	r2, =EE_arm9_active_tos
-	LDR	r3, [r2]
-
-	CMP	r3, r1
-	MOVEQ	pc, lr
-
-	// Before changing the stack, we have to save the registers
-	// that could be modified (i.e. all the registers that should
-	// be preserved through function calls). Note that if there is
-	// not the stack change, the system will behave like the
-	// monostack version of the kernel
+/** (3) save_callee_saved_registers(); **/
+	// We can use those regs as scratch registers until we restore context form stack we want to change to
  	STMFD	sp!, {r4-r11}
-
-	// from now until the LDMFD I can use r0-r11 as scratch!
-	// r2=&EE_arm9_active_tos
-	// r4=&EE_arm9_system_tos
 	
-	//
+/** (4) switch_stacks(tos_index); **/
+
 	// Save current TOS
-	//
-	// r4 = &EE_arm9_system_tos
-	LDR	r4, =EE_arm9_system_tos
-	// r3 = & EE_arm9_system_tos[EE_arm9_active_tos].SYS_tos
-	ADD	r3, r4, r3, LSL#2
+	LDR		r4, =EE_arm9_system_tos
 
-	// EE_arm9_system_tos[EE_arm9_active_tos].SYS_tos = sp_SYS
-	STR	sp, [r3]
+	// r3 = &EE_arm9_system_tos[EE_arm9_active_tos]
+	ADD		r3, r4, r3, LSL#2
 
-	//
-	// New current TOS
-	//
-	// remember that r4 = &EE_arm9_system_tos
-	// r3 = & EE_arm9_system_tos[tos_index].SYS_tos
-	ADD	r3, r4, r1, LSL#2
+	// EE_arm9_system_tos[EE_arm9_active_tos] = current_sp
+	STR		sp, [r3]
 
-	// sp_SYS = EE_arm9_system_tos[tos_index].SYS_tos
-	LDR	sp, [r3]
+	// Get new TOS
+	// r3 = &EE_arm9_system_tos[tos_index]
+	ADD		r3, r4, r0, LSL#2
+
+	// new_sp = EE_arm9_system_tos[tos_index]
+	LDR		sp, [r3]
 	
-	//
-	// Update arm9_active_tos (= tos_index)
-	//
-	// remember that r2=&EE_arm9_active_tos
-	STR	r1, [r2]
+	// Update active TOS (index) 
+	STR		r0, [r2]
 
-	// Here we have to restore the registers saved before the
-	// stack previous change. If this is the first time we use the
-	// current stack, restoring is useless.
+/** (5) restore_callee_saved_registers(); **/
  	LDMFD	sp!, {r4-r11}
+
+skip_stack_change: // This lable is also used to return from EE_arm9_change_tos
+
+	// Write tid back to r0 
+	MOV 	r0, r1 
+
+	// EE_arm9_read_stack_mark rqeuiest to contain tid
+	BL 		EE_arm9_read_stack_mark	
+
+/** (6) if (is_not_marked_stacked(tid)) { **/
+	// The conditionflag still holds true if we have did not have to change stack earlier
+	// If skip_stack_change == taken && skip_std_run_task == taken then POP {lr}
+	// This is required because this context switch is just supposed to go back to its original caller
+	// But as we pushed LR at the beginning of the function our Stack is offset incorrectly by one PUSH
+	BLNE	skip_lr_restoring 	// If we changed stack we do not want to do this
+	CMP 	r0, #0 			 	// Check if the stack is marked as well  
+	POPNE	{lr}				// Restore LR as described above
+skip_lr_restoring:
+	CMP		r0, #0
+
+	// If stack == marked skip (7) and (8)
+	// If the task is marked we already started it and dont want to start from the begining
+	BNE	skip_std_run_task 
+
+	// TID was saved in r1 restore it to r0 for function argument
+	MOV 	r0, r1
+
+/** (6.5) mark_stack(tid) [Not documented but required] **/
+	BL		EE_arm9_write_stack_mark
+
+	// Write tid back to r0 
+	MOV 	r0, r1 
+
+/** (7) tid = EE_std_run_task_code(tid); **/
+	// Return value tid written to r0 where tid is supposed to be at start of the function
+	BL 		EE_std_run_task_code
+
+	// No specific value required at start of function for r3
+	LDR 	r3, =EE_std_change_context
+
+
+/** (8) goto begin; **/
+ 	MOV		pc, r3
 	
-	MOV	pc, lr
+skip_std_run_task: 
 
-	
-	
-//
-// MONO:  not defined
-// MULTI: void EE_arm9_hal_stkchange(EE_UREG 0, EE_UREG tos_index)
-//
-// Typically called into a generic primitive to implement a blocking
-// synchronization primitive.
-//
 
-EE_arm9_hal_stkchange:  
-        
-        // Mk: saving lr here and restoring it after EE_arm9_change_tos is mandatory, in order to
-        // save lr of the preempted thread and to restore lr of the preempter thread
-        //      from their respective stacks!
-        STMFD   sp!, {lr}
+ 	// Restore return address to original context
+ 	POP		{lr}
 
-        // switch to the TOS of the new thread
-        BL      EE_arm9_change_tos
-
-        // now the stack is changed, and we need to return to the interrupted thread!
-        LDMFD   sp!, {lr}
-        BX      lr
-        
-
-#endif // __MULTI__
-
-	
-//
-// MONO:  void EE_arm9_hal_ready2stacked(ADDR thread_addr)
-// MULTI: void EE_arm9_hal_ready2stacked(ADDR thread_addr, EE_UREG tos_index)
-//
-// Typically called into a generic primitive to implement preemption.
-//
-EE_arm9_hal_ready2stacked:	
-	// We have to save LR into the stack (APCS standard)
- 	STMFD	sp!, {lr}
-1:	
-#ifdef __MULTI__
-	// Switch Stack if required to stack of new Task
-	BL	EE_arm9_change_tos
-#endif
-
-	bl irq_enable
-
-	// Jump to the preempter thread (r0 = first parameter)
-	MOV	lr, pc
-	BX	r0
-
-	// EE_thread_end_instance() requires interrupts to be disabled
-	bl irq_disable
-		
-	// Call to Scheduler 
-	BL	EE_thread_end_instance
-	
-	/**
-	 * if EE_hal_endcycle_next_thread == 0
-	 *   then wake up the preempted thread
-	 *   (EE_arm9_hal_endcycle_stacked executed)
-	 *
-	 * if EE_hal_endcycle_next_thread != 0
-	 *   then activate a new thread
-	 *   (EE_arm9_hal_endcycle_ready executed)
-	 */
-#ifdef __MULTI__
-	LDR	r2, =EE_hal_endcycle_next_tos
-	LDR	r1, [r2]
-#endif
-	
-	LDR	r2, =EE_hal_endcycle_next_thread
-	LDR	r0, [r2]
-
-	// Check if next_thread was actually set if not redo from start
-	CMP	r0, #0
-	BNE	1b
-	// Switch Stack if required to stack of preempted Task
-#ifdef __MULTI__
-	BL	EE_arm9_change_tos
-#endif
-	// Keep interrupts disabled as this will return into a primitiv that requires it or IRQ handler
-	LDMFD	sp!, {lr}
-	BX	lr
+	// Return from function
+	MOV		pc, lr
+#endif /* __MULTI__ */

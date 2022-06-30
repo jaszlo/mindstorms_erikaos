@@ -11,7 +11,10 @@
 
 /* Initial stack offset (in words): Used in multistack. */
 #ifndef ARM9_INIT_TOS_OFFSET
-#define ARM9_INIT_TOS_OFFSET 10
+// We push r4-r11,lr on stack. The offset is so we don't overwrite the context (the registers)
+//  {r4-r12, lr} are 9 registers (9+1 is our required offset then)
+#define ARM9_INIT_TOS_OFFSET 0x10
+#define CORTEX_MX_INIT_TOS_OFFSET ARM9_INIT_TOS_OFFSET // required due to RT_DRUID workaround
 #endif
 
 /*************************************************************************
@@ -52,7 +55,7 @@ typedef EE_INT32 EE_TID;
 typedef EE_UINT32 EE_UTID;
 
 /* Used by the common layer to decide whether to start a new thread */
-#define TID_IS_STACKED_MARK 0x80000000 // Only required for MULTI
+#define TID_IS_STACKED_MARK 0x80000000 // Only required for MULTI // MSB of 32bit Integer
 
 
 static void EE_hal_endcycle_stacked(EE_TID thread);

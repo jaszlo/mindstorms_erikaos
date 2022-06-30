@@ -129,4 +129,5 @@ void put_ptr(const void *ptr)
     set_base(HEX);
     put_num((int)ptr);
     set_base(old_base);
+    __nl;
 }

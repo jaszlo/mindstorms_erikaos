@@ -7,6 +7,7 @@
 .globl EE_write_after_IRQ_lr
 
 .section .text
+
 /**
  * IRQs are disabled on entering this function and enabled on leaving
  */

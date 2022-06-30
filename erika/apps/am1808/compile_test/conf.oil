@@ -1,0 +1,40 @@
+CPU test_application {
+
+	OS EE {
+
+		EE_OPT = "__ARM9__";
+		EE_OPT = "__AM1808__";
+		EE_OPT = "__REBOOT__";
+		EE_OPT = "__GNU__";
+
+		// Just to set inner values
+		CPU_DATA = CORTEX_MX {
+			MODEL = M4;
+			APP_SRC = "main.c";
+			COMPILER_TYPE = GNU;
+			MULTI_STACK = FALSE;
+			
+		};
+
+		STATUS = EXTENDED;
+		STARTUPHOOK = FALSE;
+		ERRORHOOK = FALSE;
+		SHUTDOWNHOOK = FALSE;
+		PRETASKHOOK = FALSE;
+		POSTTASKHOOK = FALSE;
+		USEGETSERVICEID = FALSE;
+		USEPARAMETERACCESS = FALSE;
+		USERESSCHEDULER = FALSE;
+		KERNEL_TYPE = BCC1;
+		EE_OPT = "__OO_STARTOS_OLD__"; // No Infinity-Loop at end of StartOS
+
+	};
+
+	/* this is the OIL part for the task */
+	TASK Task1 {
+		PRIORITY = 0x01;   /* Low priority */
+		AUTOSTART = TRUE;
+		ACTIVATION = 1;    /* only one pending activation */
+		STACK = SHARED;
+	};
+};

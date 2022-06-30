@@ -34,5 +34,6 @@ EE_arm9_after_IRQ_schedule:
     BL      EE_get_running_task // r0 now contains the TID of the running task or EE_MAX_TASK if no task currently in running state
     CMP     r0, #0              // Now compare flag greater than or equal should be true if we want to call schedule
     BLGE    EE_oo_Schedule      // This assumes that we will later return to this function from Schedule!!!
+    BL      irq_enable          // Enable interrupts again
     POP     {lr}                // Meaning we cant Schedule back to the interrupted Task!
     MOV     pc, lr

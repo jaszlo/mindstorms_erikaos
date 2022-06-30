@@ -26,6 +26,19 @@ else
     echo
 fi
 
+# Install qemu for arm system i.e. the versatilepb MCU 
+dpkg -l | grep qemu-system-arm &> /dev/null
+if [[ $? -eq 0 ]]
+then
+    echo qemu-system-arm already installed 
+    echo
+else
+    echo Installting qemu-system-arm
+    sudo apt install qemu-system-arm
+    echo
+fi
+
+
 # Compiling third-party tools
 if [[ -f "./third_party/wermit/wermit" ]]
 then
