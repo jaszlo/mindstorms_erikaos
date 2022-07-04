@@ -31,11 +31,10 @@
 	 */
 
 #ifdef __AM1808__							
-#define EE_ISR2_poststub(void) 					\
-	irq_clear_status(irq_get_current_num()); 	
+#define EE_ISR_post_stub(void) irq_clear_status(irq_get_current_num()); 
 #endif 	/* __AM1808__ */
 #ifdef __VERSATILEPB__
-#define EE_ISR2_poststub(void) 
+#define EE_ISR_post_stub(void)
 #endif /* __VERSATILEPB__ */						
   	/*irq_enable()*/;							
 	/** TODO for nested IRQ
@@ -43,13 +42,14 @@
 	 *  (2) Set the restored IRQ priority in hardware
 	 */
 
-#define ISR1(f)          \
-	void ISR1_##f(void); \
-	__IRQ void f(void)   \
-	{                    \
-		ISR1_##f();      \
-	}                    \
-	void ISR1_##f(void)
+#define ISR1(f)         	\
+void ISR1_##f(void); 		\
+void f(void)   				\
+{                    		\
+	ISR1_##f();      		\
+	EE_ISR_post_stub(void); /* clears irq flags */ \
+}                    		\
+void ISR1_##f(void)
 
 
 #define ISR2(f)				\
@@ -58,7 +58,7 @@ void f(void) 				\
 {				       		\
 	EE_ISR2_prestub(); 		\
 	ISR2_ ## f();			\
-	EE_ISR2_poststub();		\
+	EE_ISR_post_stub(void); \
 }							\
 void ISR2_ ## f(void)
 

@@ -46,7 +46,6 @@ CPU test_application {
 		AUTOSTART = FALSE;
 		STACK = PRIVATE { SYS_SIZE = 1024; };
 		EVENT = TimerEvent;
-		EVENT = ButtonEvent;
 	};
 
 	EVENT TimerEvent  { MASK = AUTO; };
@@ -60,7 +59,7 @@ CPU test_application {
 	ALARM Alarm1 {
 		COUNTER = Counter1;
 		ACTION = SETEVENT { TASK = Task2; EVENT = TimerEvent; };
-		AUTOSTART = TRUE { ALARMTIME = 10; CYCLETIME = 0; };
+		AUTOSTART = TRUE { ALARMTIME = 1; CYCLETIME = 0; };
 	};
 
 	ISR timer_handler {

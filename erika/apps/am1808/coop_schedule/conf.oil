@@ -4,7 +4,6 @@ CPU test_application {
 
 		EE_OPT = "__ARM9__";
 		EE_OPT = "__AM1808__";
-		EE_OPT = "__REBOOT__";
 		EE_OPT = "__GNU__";
 
 		// Just to set inner values

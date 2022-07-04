@@ -198,9 +198,9 @@ static void EE_oo_handle_action_task(EE_oo_action_ROM_type const * const
 }
 
 #if (defined(__OO_ECC1__)) || (defined(__OO_ECC2__))
-void __attribute__((optimize("O0"))) EE_oo_handle_action_event(EE_oo_action_ROM_type const * const p_action);
+void EE_oo_handle_action_event(EE_oo_action_ROM_type const * const p_action);
   
-void __attribute__((optimize("O0"))) EE_oo_handle_action_event(EE_oo_action_ROM_type const * const
+void EE_oo_handle_action_event(EE_oo_action_ROM_type const * const
   p_action)
 {
   /* Error Value */

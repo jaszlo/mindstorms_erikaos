@@ -5,7 +5,6 @@
 EE_UREG EE_hal_endcycle_next_thread;
 EE_UREG EE_hal_endcycle_next_tos;
 
-
 extern EE_UINT32 EE_terminate_data[];
 
 void print_terminate_data(void)
@@ -29,6 +28,14 @@ EE_TID EE_stack_is_marked[EE_MAX_TASK + 1];
 void EE_arm9_write_stack_mark(EE_TID tid) 
 {
   EE_stack_is_marked[tid + 1] = 1;
+}
+
+void EE_arm9_write_stack_unmarked(EE_TID tid)
+{
+  if (tid >= 0) // Never Unmark shared stack
+  {
+    EE_stack_is_marked[tid + 1] = 0;
+  }
 }
 
 // Returns 1 if is marked else 0
@@ -63,3 +70,7 @@ EE_TID EE_get_running_task(void)
 }
 
 
+void EE_after_IRQ_preemption(void)
+{
+  EE_oo_preemption_point();
+}

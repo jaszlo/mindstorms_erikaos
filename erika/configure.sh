@@ -39,6 +39,31 @@ else
 fi
 
 
+# Install python3.9 for testcase script helper
+dpkg -l | grep "python3.9 " &> /dev/null
+if [[ $? -eq 0 ]]
+then
+    echo python3.9 already installed 
+    echo
+else
+    echo Installting python3.9
+    sudo apt install python3.9
+    echo
+fi
+
+# Install pip3 for python for testcase script helper
+dpkg -l | grep "python3-pip" &> /dev/null
+if [[ $? -eq 0 ]]
+then
+    echo python3-pip already installed 
+    echo
+else
+    echo Installting python3-pip and required dependencies
+    sudo apt install pip3
+    pip install pynput
+    echo
+fi
+
 # Compiling third-party tools
 if [[ -f "./third_party/wermit/wermit" ]]
 then

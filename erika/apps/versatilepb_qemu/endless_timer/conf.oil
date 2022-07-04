@@ -38,6 +38,14 @@ CPU test_application {
 		STACK = SHARED;
 	};
 
+	TASK Task2 {
+		PRIORITY = 0x02;  
+		AUTOSTART = FALSE;
+		ACTIVATION = 1;    /* only one pending activation */
+		STACK = SHARED;
+	};
+
+
 	ISR timer_handler {
 		CATEGORY = 2;
 		ENTRY = "TIMER"; // For the arm9 port "TIMER" is the only valid value here.

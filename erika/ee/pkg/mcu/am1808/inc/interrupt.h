@@ -1,5 +1,5 @@
-#ifndef __INCLUDE_ARM9_INTERRUPT__
-#define __INCLUDE_ARM9_INTERRUPT__
+#ifndef __INCLUDE_AM1808_INTERRUPT__
+#define __INCLUDE_AM1808_INTERRUPT__
 
 // If we want to include this into .S file do ot include functions!
 #ifndef ASM_INC 
@@ -214,4 +214,4 @@ void irq_handler(void);
 #define IRQ_NUM_MCBSP1_RINT 99  // McBSP1 Receive Interrupt
 #define IRQ_NUM_MCBSP1_XINT 100  // McBSP1 Transmit Interrupt
 
-#endif //__INCLUDE_ARM9_INTERRUPT__
+#endif //__INCLUDE_AM1808_INTERRUPT__

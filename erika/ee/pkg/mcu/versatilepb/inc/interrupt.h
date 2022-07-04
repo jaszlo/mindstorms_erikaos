@@ -1,5 +1,5 @@
-#ifndef __INCLUDE_ARM9_INTERRUPT__
-#define __INCLUDE_ARM9_INTERRUPT__
+#ifndef __INCLUDE_VERSATILEPB_INTERRUPT__
+#define __INCLUDE_VERSATILEPB_INTERRUPT__
 
 
 // Primary Interrupt Controller (PL190)
@@ -45,4 +45,4 @@ void irq_handler(void);
 
 #define IRQ_NUM_TIMER 4  // TIMER
 
-#endif /* __INCLUDE_ARM9_INTERRUPT__ */
+#endif /* __INCLUDE_VERSATILEPB_INTERRUPT__ */

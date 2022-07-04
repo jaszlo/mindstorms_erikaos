@@ -1,5 +1,5 @@
-#ifndef __INCLUDE_ARM9_TIMER__
-#define __INCLUDE_ARM9_TIMER__
+#ifndef __INCLUDE_AM1808_TIMER__
+#define __INCLUDE_AM1808_TIMER__
 #define TIMER_PERIOD 0x10000
 
 // INTCTLSTAT bits
@@ -38,7 +38,7 @@
 #define ENAMODE12 (0b11 << 6)           // Does the same as the above but for different timer mode 
 #define ENAMODE12_CONTIN (0b10 << 6)    //                             //
 #define CLKSRC12 (1 << 8)               // Bit to set timer clock external TM64P_IN12 clock
-                                        // Block diagramm: https://www.ti.com/lit/ug/spruh82c/spruh82c.pdf#page=1469
+#define CLKSRC34 (0x01000000u)          // Block diagramm: https://www.ti.com/lit/ug/spruh82c/spruh82c.pdf#page=1469
 
 
 // TGRC bits
@@ -62,5 +62,8 @@ void timer_stop(void);
 
 // Clears the IRQ flag from the timer that pulls the IRQ line to the IRQ controller to high
 void timer_clear_irq_flags(void);
+
+// Enables watchdog which will reset board
+void timer_enable_watchdog(void);
 #endif //!ASM_INC
-#endif //__INCLUDE_ARM9_TIMER__
+#endif //__INCLUDE_AM1808_TIMER__

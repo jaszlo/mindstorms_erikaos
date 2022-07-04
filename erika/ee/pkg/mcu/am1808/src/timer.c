@@ -26,6 +26,7 @@ void timer_start()
   *TIMER0_INTCTLSTAT |= PRDINTEN34;   // (11) Enable interrupts
 
   *TIMER0_TCR |= ENAMODE34_CONTIN;    // (12) Set continuously-mode, start timer
+
 }
 
 void timer_stop(void)

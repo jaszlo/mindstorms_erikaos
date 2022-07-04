@@ -179,6 +179,16 @@ extern "C"
    *
    */
 
+/* __AM1808__ */
+#ifdef __AM1808__
+#include "mcu/am1808/inc/interrupt.h"
+#endif
+
+/* __VERSATILEPB__ */ 
+#ifdef __VERSATILEPB__
+#include "mcu/versatilepb/inc/interrupt.h"
+#endif
+
   /* Freescale */
 #if (defined(__MC9S12__)) || (defined(__HCS12XS__))
 #include "mcu/hs12xs/inc/ee_mcu.h"
@@ -301,6 +311,11 @@ extern "C"
    * BOARD
    *
    */
+
+  /* __MINDSTORM__ */
+#ifdef __MINDSTORM__
+#include "board/ev3_mindstorm/inc/ee_internal.h"
+#endif
 
   /* Freescale */
 #if (defined(__MC9S12__)) || (defined(__HCS12XS__))

@@ -72,11 +72,12 @@ hello_world_v2.0/build
 hello_world_v2.0/kermit_upload
 
 # ErikaOS applications
-erika/apps/am1808/*/build
-erika/apps/versatilepb_qemu/*/build
+erika/apps/*/*/build
+erika/testcases/*/*/build
+
+erika/modistarc_results
 erika/kermit_upload
 erika/.build_helper
-erika/.gdb_init
 erika/.gdb_helper
 
 # RT-druid

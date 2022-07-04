@@ -1,5 +1,5 @@
-#ifndef __INCLUDE_ARM9_PUT_CHAR_H__
-#define __INCLUDE_ARM9_PUT_CHAR_H__
+#ifndef __INCLUDE_AM1808_PUT_CHAR_H__
+#define __INCLUDE_AM1808_PUT_CHAR_H__
 
 void put_char(int c);
 
@@ -21,4 +21,4 @@ void put_char(int c);
     put_char('\n')
 #define str(s) #s
 
-#endif /* __INCLUDE_ARM9_PUT_CHAR_H__ */
+#endif /* __INCLUDE_AM1808_PUT_CHAR_H__ */

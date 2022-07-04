@@ -5,7 +5,6 @@
 .globl context_storage
 .globl print_context
 .section .text
-
 /** Call EE_arm9_terminate_savestk(&EE_terminate_data[t], (EE_ADDR)EE_terminate_real_th_body[t], t);
  *		r0 = &terminate_data[t]
  *		r1 = terminate_real_th_body[t]()
@@ -27,10 +26,6 @@ EE_arm9_terminate_savestk:
 	
 	// Store sp in terminate_data to restore current context when terminating task
 	STR sp, [r0]
-	
-	//push {r0-r12, lr}
-	//bl print_terminate_data
-	//pop {r0-r12, lr}
 
 	// Jump to Task function body
 	BX r1
@@ -40,12 +35,6 @@ EE_arm9_terminate_savestk:
  * 		r0 = &terminate_data[t]
  */
 EE_arm9_terminate_task:
-
-	//push {r0-r12, lr}
-	//bl print_terminate_data
-	//pop {r0-r12, lr}
-
-
 	// Reload sp from terminate_data[t]
 	LDR sp, [r0]
 

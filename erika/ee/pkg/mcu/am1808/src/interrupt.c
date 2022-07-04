@@ -1,6 +1,6 @@
 #include "mcu/am1808/inc/interrupt.h"
 #include "mcu/am1808/inc/timer.h"
-
+#include "cpu/arm9/inc/ee_io.h"
 // Internal function definition
 
 // ISR in ram used by irq_handler
@@ -30,7 +30,8 @@ static void aintc_init(void)
 
 static void default_isr(void) 
 {
-  while (1);
+  put_string("UNREGISTED INTERRUPT\n");
+  for (;;) {}
 }
 
 /**
@@ -182,5 +183,9 @@ void irq_init(void)
 {
   irq_disable();
   aintc_init();
+  for (unsigned int i = 0; i < NUM_INTERRUPTS; i++)
+  {
+    irq_register(i, default_isr);
+  }
   irq_enable();
 }

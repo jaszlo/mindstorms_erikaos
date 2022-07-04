@@ -21,10 +21,12 @@ irq_handler:
    * @Source: https://en.wikipedia.org/wiki/Calling_convention
    */
   // Backup Instruction address where interrupt interrupted via function that requires the value to be stored in r4 
-  SUB r4, lr, #0x4
-  STMFD    r13!, {r0-r3, r12, lr} // lr = r14
-  bl EE_write_after_IRQ_lr
-
+  STMFD     r13!, {r0-r3, r12, lr} // lr = r14
+  PUSH      {r4}                   // Push r4 as it is context from interrutped task but we need it
+  SUB       r4, lr, #0x4
+  BL        EE_write_after_IRQ_lr
+  POP       {r4}                   // Restore r4 from interrupted task
+  
   /**
    * Increase IRQ nesting level for ErikaOS (So for instance if ActivateTask is called inside IRQ handler
    * it is clear that the task should not be launched immediatly).

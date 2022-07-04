@@ -1,7 +1,5 @@
 #include "mcu/versatilepb/inc/interrupt.h"
 
-#define IVT_OFFSET (unsigned int) 0x0
-
 static void default_isr(void) 
 {
   return;

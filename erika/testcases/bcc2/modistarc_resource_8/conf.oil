@@ -1,0 +1,56 @@
+CPU test_application {
+
+    OS EE {
+
+        EE_OPT = "__ARM9__";
+		EE_OPT = "__AM1808__";
+		EE_OPT = "__GNU__";
+		EE_OPT = "__ASSERT__";
+		EE_OPT = "__WD_RESET__";
+
+
+		STATUS = EXTENDED;
+		STARTUPHOOK = FALSE;
+		ERRORHOOK = FALSE;
+		SHUTDOWNHOOK = FALSE;
+		PRETASKHOOK = FALSE;
+		POSTTASKHOOK = FALSE;
+		USEGETSERVICEID = FALSE;
+		USEPARAMETERACCESS = FALSE;
+		USERESSCHEDULER = TRUE;
+
+		EE_OPT = "__OO_STARTOS_OLD__";
+		KERNEL_TYPE = BCC2;
+
+		// Just to set inner values
+		CPU_DATA = CORTEX_MX {
+			MODEL = M4;
+			APP_SRC = "main.c";
+			COMPILER_TYPE = GNU;
+			MULTI_STACK = FALSE;
+			
+		};
+	};
+
+    TASK Task1 {
+		PRIORITY = 1;
+		ACTIVATION = 1;
+		SCHEDULE = FULL;
+		AUTOSTART = FALSE;
+		STACK = SHARED;
+		RESOURCE = MyResource;
+    };
+
+	TASK Task2 {
+		PRIORITY = 2;
+		ACTIVATION = 1;
+		SCHEDULE = FULL;
+		AUTOSTART = FALSE;
+		STACK = SHARED;
+		RESOURCE = MyResource;
+    };
+
+	RESOURCE MyResource { RESOURCEPROPERTY = STANDARD; };
+
+};
+

@@ -79,6 +79,7 @@ static void EE_hal_endcycle_ready(EE_TID thread);
 #include "mcu/am1808/inc/timer.h"
 #include "mcu/am1808/inc/interrupt.h"
 #include "mcu/am1808/inc/put_char.h"
+#include "mcu/am1808/inc/watchdog.h"
 #endif /* __AM1808__ */
 #ifdef __VERSATILEPB__
 #include "mcu/versatilepb/inc/timer.h"
@@ -110,6 +111,7 @@ static void EE_hal_endcycle_ready(EE_TID thread);
 #define EE_irq_clear_status(num)  irq_clear_status(num)
 #define EE_irq_enable() irq_enable()
 #define EE_irq_disable() irq_disable()
+#define EE_irq_status() irq_status()
 #define EE_irq_enable_num(num) irq_enable_num(num)
 #define EE_irq_disable_num(num) irq_disable_num(num)
 

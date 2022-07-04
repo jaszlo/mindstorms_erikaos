@@ -5,7 +5,6 @@
 
 extern EE_TID EE_std_endcycle_next_tid;
 
-
 /* The multistack version must be implemented in ASM; no standard
  * implementation, sorry.  This is the only function that performs context
  * switching.  The multistack version doesn't jump to the task body if its TID
@@ -27,9 +26,7 @@ void EE_std_change_context(EE_TID tid);
       }
       if (is_not_marked_stacked(tid)) {
           tid = EE_std_run_task_code(tid);
-          if (tid >= 0) {
             goto begin;
-          }
       }
 
       Please notice that the "goto begin" is actually a recursive call to

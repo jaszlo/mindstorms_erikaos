@@ -1,13 +1,6 @@
 #ifndef __INCLUDE_ARM9_INTERNAL_H__
 #define __INCLUDE_ARM9_INTERNAL_H__
 
-#ifdef __AM1808__
-#include "mcu/am1808/inc/interrupt.h"
-#endif
-#ifdef __VERSATILEPB__
-#include "mcu/versatilepb/inc/interrupt.h"
-#endif
-
 #include "cpu/arm9/inc/ee_cpu.h"
 #include "cpu/arm9/inc/cpsr.h"
 #include "cpu/arm9/inc/ee_context.h"
@@ -60,10 +53,15 @@ __INLINE__ void __ALWAYS_INLINE__ EE_hal_terminate_savestk(EE_TID tid)
 }
 
 
+void EE_arm9_write_stack_unmarked(EE_TID tid); // Implemented in ee_internal.c
+
 /** Restore the context saved by EE_hal_terminate_savestk() for the task `tid' and
  * return from EE_hal_terminate_savestk().  Implemented in assembly */
 __INLINE__ void __ALWAYS_INLINE__ EE_hal_terminate_task(EE_TID tid)
 {
+  #ifdef __MULTI__
+  EE_arm9_write_stack_unmarked(tid); // Unmark stack 
+  #endif /* __MULTI__ */
   EE_arm9_terminate_task(&EE_terminate_data[tid]);
 }
 

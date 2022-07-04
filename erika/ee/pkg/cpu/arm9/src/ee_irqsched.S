@@ -2,7 +2,7 @@
 //Import
 .globl EE_get_after_IRQ_lr
 .globl EE_get_running_task
-.globl EE_oo_Schedule
+.globl EE_after_IRQ_preemption
 .globl put_ptr
 //Export
 .globl EE_arm9_after_IRQ_schedule
@@ -28,12 +28,14 @@
  *  because EE_get_after_IRQ_lr requires the setup of the LR storage done in the irq_handler
  */
 EE_arm9_after_IRQ_schedule:
-    BL      EE_get_after_IRQ_lr // r0 now contains new lr value
-    MOV     lr, r0              // Restore original lr so it seems as if this function was called from within the interrupted Task
-    PUSH    {lr}                // Save lr before scheduling
-    BL      EE_get_running_task // r0 now contains the TID of the running task or EE_MAX_TASK if no task currently in running state
-    CMP     r0, #0              // Now compare flag greater than or equal should be true if we want to call schedule
-    BLGE    EE_oo_Schedule      // This assumes that we will later return to this function from Schedule!!!
-    BL      irq_enable          // Enable interrupts again
-    POP     {lr}                // Meaning we cant Schedule back to the interrupted Task!
+    STMFD    sp!, {r0-r3, r12}          // Again save context
+    BL      EE_get_after_IRQ_lr         // r0 now contains new lr value
+    MOV     lr, r0                      // Restore original lr so it seems as if this function was called from within the interrupted Task
+    PUSH    {lr}                        // Save lr before scheduling
+    BL      EE_get_running_task         // r0 now contains the TID of the running task or EE_MAX_TASK if no task currently in running state
+    CMP     r0, #0                      // Now compare flag greater than or equal should be true if we want to call schedule
+    BLGE    EE_after_IRQ_preemption     // Call "Scheduler" This will check if we even want to preempt
+    BL      irq_enable                  // Enable interrupts again
+    POP     {lr}                        // Meaning we cant Schedule back to the interrupted Task!
+    LDMFD    sp!, {r0-r3, r12}          // Again restore context
     MOV     pc, lr

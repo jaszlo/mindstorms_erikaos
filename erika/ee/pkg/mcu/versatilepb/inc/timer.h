@@ -1,5 +1,5 @@
-#ifndef __INCLUDE_ARM9_TIMER__
-#define __INCLUDE_ARM9_TIMER__
+#ifndef __INCLUDE_VERSATILEPB_TIMER__
+#define __INCLUDE_VERSATILEPB_TIMER__
 
 // Timer Adresses
 #define TIMER1_BASE 0x101E2000
@@ -24,4 +24,4 @@ void timer_stop(void);
 
 // Clears the IRQ flag from the timer that pulls the IRQ line to the IRQ controller to high
 void timer_clear_irq_flags(void);
-#endif /* __INCLUDE_ARM9_TIMER__ */
+#endif /* __INCLUDE_VERSATILEPB_TIMER__ */

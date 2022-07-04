@@ -1,5 +1,7 @@
 #include "cpu/arm9/inc/ee_io.h"
 
+#include "test/assert/inc/ee_assert.h"
+
 #ifdef __AM1808__
 #include "mcu/am1808/inc/put_char.h"
 #endif
@@ -32,7 +34,7 @@ void print_mem(void *addr, unsigned int len)
         for (int j = 0; j < 4; j++)
         {
             long *l = (long *)addr;
-            put_num(*(l + i + j));
+            put_uint(*(l + i + j));
             put_char('\t');
         }
         put_char('\n');
@@ -61,11 +63,10 @@ void put_int(int i)
         i = -i;
     }
 
-    put_num((unsigned long long)i);
-    put_char('\n');
+    put_uint((unsigned long long)i);
 }
 
-void put_num(unsigned int i)
+void put_uint(unsigned int i)
 {
     // Add prefix
     switch (base)
@@ -127,7 +128,55 @@ void put_ptr(const void *ptr)
 {
     unsigned int old_base = base;
     set_base(HEX);
-    put_num((int)ptr);
+    put_uint((int)ptr);
     set_base(old_base);
-    __nl;
 }
+
+#ifdef __ASSERT__
+extern EE_TYPEASSERTVALUE EE_expectations[];
+
+void put_assertion(EE_TYPEASSERTVALUE assertion)
+{
+
+    switch (assertion)
+    {
+        case -1:
+            put_string("EE_ASSERT_NIL");
+            break;
+        case 0:
+            put_string("EE_ASSERT_INITVALUE");
+            break;
+        case 1:
+            put_string("EE_ASSERT_YES");
+            break;
+        case 2:
+            put_string("EE_ASSERT_NO");
+            break;
+        case 3:
+            put_string("EE_ASSERT_ALREADYUSED");
+            break;
+
+    }
+}
+
+void EE_assert_summarize(const char *test_name, unsigned int result, unsigned int size)
+{
+    if (result == EE_ASSERT_YES)
+    {   
+        put_string("\t\t\t\t\t\t\t");
+        put_string(test_name); put_string(" passed! ✓"); __nl;
+    } else
+    {
+        put_string("\t\t\t\t\t\t\t");
+        put_string(test_name); put_string(" failed! ✗"); __nl;
+    
+        for (int i = 0; i < size; i++)
+        {
+            if (EE_assertions[i] != EE_ASSERT_YES) 
+            {
+                put_string("\t\t\t\t\t\t\t\tAssertion "); put_uint(i); put_string (" failed!\n");
+            }
+        }
+    }
+}
+#endif /* __ASSERT__ */

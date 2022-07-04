@@ -164,6 +164,7 @@ extern "C"
    *
    */
 
+
   /* Freescale */
 #if (defined(__MC9S12__)) || (defined(__HCS12XS__))
 #include "mcu/hs12xs/inc/ee_internal.h"
@@ -276,6 +277,11 @@ extern "C"
    * Board
    *
    */
+
+  /* __MINDSTORM__ */
+#ifdef __MINDSTORM__
+#include "board/ev3_mindstorm/inc/ee_internal.h"
+#endif
 
   /* Freescale */
 #if (defined(__MC9S12__)) || (defined(__HCS12XS__))

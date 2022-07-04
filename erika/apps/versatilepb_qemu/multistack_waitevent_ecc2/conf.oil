@@ -1,0 +1,51 @@
+CPU test_application {
+
+	OS EE {
+
+		EE_OPT = "__ARM9__";
+		EE_OPT = "__VERSATILEPB__";
+		EE_OPT = "__GNU__";
+		
+		// Just to set inner values
+		CPU_DATA = CORTEX_MX {
+			MODEL = M4;
+			APP_SRC = "main.c";
+			COMPILER_TYPE = GNU;
+			MULTI_STACK = TRUE; 
+			
+		};
+
+
+		STATUS = EXTENDED;
+		STARTUPHOOK = FALSE;
+		ERRORHOOK = FALSE;
+		SHUTDOWNHOOK = FALSE;
+		PRETASKHOOK = FALSE;
+		POSTTASKHOOK = FALSE;
+		USEGETSERVICEID = FALSE;
+		USEPARAMETERACCESS = FALSE;
+		USERESSCHEDULER = FALSE;
+		KERNEL_TYPE = ECC2;
+		EE_OPT = "__OO_STARTOS_OLD__"; // No autosar compliance
+
+	};
+
+	TASK Task1 {
+		SCHEDULE = FULL;
+		PRIORITY = 0x01;  
+		ACTIVATION = 2;  
+		AUTOSTART = FALSE;
+		STACK = SHARED;
+	};
+
+	TASK Task2 {
+		SCHEDULE = FULL;
+		PRIORITY = 0x02;
+		ACTIVATION = 2;
+		AUTOSTART = FALSE;
+		STACK = PRIVATE { SYS_SIZE = 1024; };
+		EVENT = MyEvent;
+	};
+
+	EVENT MyEvent  { MASK = AUTO; };
+};

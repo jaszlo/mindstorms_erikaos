@@ -1,16 +1,29 @@
 #include "ee.h"
 
+volatile int flag = 0;
 
 ISR2(timer_handler)
 {
-  put_string("isr\n");
+  flag = 1;
   EE_timer_clear_irq_flags();
+  ActivateTask(Task2);
 }
 
+TASK(Task2)
+{
+  put_string("\tTask2!\n");
+  TerminateTask();
+}
 
 TASK(Task1) 
 {
-  while(1) {}
+  while(1) {
+    if(flag == 1) {
+      flag = 0;
+      put_string("Task1!\n");
+    }
+  }
+  TerminateTask();
 }
 
 

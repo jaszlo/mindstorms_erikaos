@@ -34,7 +34,7 @@ TASK(Task2)
 TASK(Task1)
 {
   while(task2_fired == 0) {}
-  put_string("\t\tTask2 finished\n");
+  put_string("\t\tTask1 finished\n");
   TerminateTask();
 }
 

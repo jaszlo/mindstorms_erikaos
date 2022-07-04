@@ -89,12 +89,10 @@ void system_init(void) {
     // Should only be here as long as developing
     
     // Only reboot on real hardware for faster debugging
-    #ifdef __REBOOT__
-    reboot();
+    #ifdef __WD_RESET__
+    watchdog_trigger();
     #endif
     
-    // Only for debugging 
-    // put_string("\t\tEnd of Program!\n");
     while(1);
     // Undefined behaviour as we go back to reset_handler but behind valid instruction!
 }

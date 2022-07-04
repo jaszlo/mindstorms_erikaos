@@ -19,10 +19,12 @@ irq_handler:
    * @Source: https://en.wikipedia.org/wiki/Calling_convention
    */
 
-  // Backup Instruction address where interrupt interrupted via function that requires the value to be stored in r4 
-  SUB r4, lr, #0x4
-  STMFD    r13!, {r0-r3, r12, lr} // lr = r14
-  bl EE_write_after_IRQ_lr
+  // Backup Instruction address where interrupt interrupted via function that requires the value to be stored in r4
+  STMFD     r13!, {r0-r3, r12, lr} // lr = r14
+  PUSH      {r4}                   // Push r4 as it is context from interrutped task but we need it
+  SUB       r4, lr, #0x4
+  BL        EE_write_after_IRQ_lr
+  POP       {r4}                   // Restore r4 from interrupted task
 
   /**
    * Increase IRQ nesting level for ErikaOS (So for instance if ActivateTask is called inside IRQ handler
@@ -30,28 +32,28 @@ irq_handler:
    * Note that IRQ nesting is not implemented but we increment it (to a maximum value of 1) in order for
    * OSEK-System-Services to note when they are being called from within an ISR. 
    */
-  LDR	r0, =EE_IRQ_nesting_level
-  LDR	r1, [r0]
-  ADD	r1, r1, #1
-  STR	r1, [r0]       
+  LDR	      r0, =EE_IRQ_nesting_level
+  LDR	      r1, [r0]
+  ADD	      r1, r1, #1
+  STR	      r1, [r0]       
 
-  ADD      lr, pc, #0        // Save return to this IRQ handler LR
-  LDR      pc, =isr_wrapper  // Go to ISR
+  ADD       lr, pc, #0        // Save return to this IRQ handler LR
+  LDR       pc, =isr_wrapper  // Go to ISR
 
   // Decrease IRQ nesting level for ErikaOS
-  LDR	r0, =EE_IRQ_nesting_level
-  LDR	r1, [r0]
-  SUB	r1, r1, #1
-  STR	r1, [r0]     
+  LDR	      r0, =EE_IRQ_nesting_level
+  LDR	      r1, [r0]
+  SUB	      r1, r1, #1
+  STR	      r1, [r0]     
 
   // Restore Context
-  LDMFD    r13!, {r0-r3, r12, lr}
+  LDMFD     r13!, {r0-r3, r12, lr}
   
   // As we return overwrite LR so it 
   // seems for original context as if it called this function
   // In that function we restore our backed up LR
-  LDR lr, =EE_arm9_after_IRQ_schedule
+  LDR       lr, =EE_arm9_after_IRQ_schedule
 
   // Note that the S in sub(S) flag toggle the IRQ bit in the CPSR register enabling IRQ atomtically
   // @Source: https://developer.arm.com/documentation/dui0489/i/arm-and-thumb-instructions/subs-pc--lr?lang=en  
-  SUBS     pc, lr, #0x0
+  SUBS       pc, lr, #0x0

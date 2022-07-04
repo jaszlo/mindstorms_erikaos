@@ -1,1 +1,0 @@
-This folder show that the propertiy SCHEDULE of task in the oil files has no influence on the generated config files

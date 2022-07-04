@@ -91,8 +91,10 @@ OPT_CC += -fshort-enums
 # Compile and assemble, but do not link 
 OPT_CC += -c 
 
-# Debug info
+# Debug info for QEMU
+ifeq ($(call iseeopt, __VERSATILEPB__), yes)
 OPT_CC += -g
+endif
 
 # Specific option from the application makefile. Not used here probably
 OPT_CC += $(CFLAGS)
