@@ -24,7 +24,7 @@ swi_handler_addr:            .word swi_handler
 prefetch_abort_handler_addr: .word prefetch_abort_handler
 data_abort_handler_addr:     .word data_abort_handler
 irq_handler_addr:            .word irq_handler
-fiq_handler_addr:            .word irq_handler
+fiq_handler_addr:            .word fiq_handler
 
 vectors_end:
 

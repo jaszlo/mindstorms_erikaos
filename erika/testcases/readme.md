@@ -23,14 +23,9 @@ The Testcases are specified [here](https://www.osek-vdx.org/mod_20/ostestplan20.
 The numbers correspond to the testcase number in that document. Note that if a number is missing from the testcases here
 Some of the testcases only exists for the ECC1 or BCC2 and ECC2 conformance class and therefore will only be found in their correpsonding folder.
 
-### Excluded Tests and additional information
-The following task management tests are only available in the ecc2/bcc2 folder because they test BCC2 and ECC2 specific behaviour
-* 5
-* 12, 13, 14
-* 17, 18
-* 32
+### Additional information
 
-In addition ErikaOS does not provide the following API-Calls. 
+ErikaOS does not provide the following API-Calls. 
 * EnableInterrupt()
 * DisableInterrupt()
 * GetInterruptDescriptor()
@@ -43,9 +38,9 @@ When reading the testcases source code note that some testcases have the exact s
 
 ## Running the testcases
 
-(1) Connect the UART dongle
-(2) Start the ev3 Mindstorm
-(3) Make sure C-Kermit is compiled and python installed
-(4) Call `make modistarc` Check stdout or modistarc_results file for testcase results
+1. Connect the UART dongle
+2. Start the ev3 Mindstorm
+3. Make sure C-Kermit is compiled and python installed
+4. Call `make modistarc` from `erika/` folder and check stdout or modistarc_results file for testcase results
 
 Note: Compilation will take a while!

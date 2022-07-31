@@ -35,6 +35,6 @@ int main(void)
   ActivateTask(Task1);
   
   unsigned int result = EE_assert_range(0, 1, ASSERTIONS-1);
-  EE_assert_summarize("BCC2 Modistarc Interrupt Processing (1, 2, 3, 4, 5)", result, ASSERTIONS);
+  EE_assert_summarize("ECC1 Modistarc Interrupt Processing (1, 2, 3, 4, 5)", result, ASSERTIONS);
   return 0;
 }

@@ -47,6 +47,12 @@ unsigned int irq_get_current_channel(void);
 // Not for external use. Implemented in arm9_interrupt_hannndler.S
 void irq_handler(void);
 
+// Disable interrupts at the AINTC
+void intctl_enable(void);
+
+// Enable interrupts at the AINTC
+void intctl_disable(void);
+
 
 #endif //!ASM_INC
 

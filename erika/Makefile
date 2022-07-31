@@ -17,9 +17,19 @@ WERMIT = third_party/wermit/wermit
 	@arm-none-eabi-objdump -D apps/am1808/$@/build/$(TARGET_NAME).elf > disassembly/all.asm
 	@arm-none-eabi-objdump -d apps/am1808/$@/build/$(TARGET_NAME).elf > disassembly/code.asm
 
+
+thesis_example:
+	$(if $(APP),,$(error APP must best set like "make <folder> APP=<app_name>"))
+	@echo ../thesis_examples/$(APP) > .build_helper
+	echo $(APP)
+	@$(MAKE) -C  thesis_examples/$(APP) all
+	@mkdir -p disassembly
+	@arm-none-eabi-objdump -D thesis_examples/$(APP)/build/$(TARGET_NAME).elf > disassembly/all.asm
+	@arm-none-eabi-objdump -d thesis_examples/$(APP)/build/$(TARGET_NAME).elf > disassembly/code.asm
+
 ### Mindstorm
 mindstorm:
-	$(if $(APP),,$(error APP must best set like "make mindstorm APP=<app_name>"))
+	$(if $(APP),,$(error APP must best set like "make <folder> APP=<app_name>"))
 	@echo mindstorm/$(APP) > .build_helper
 	@$(MAKE) -C  apps/mindstorm/$(APP) all
 	@mkdir -p disassembly
@@ -70,17 +80,16 @@ kill:
 
 ### Clean for AM1808 and QEMU
 clean:
-	@rm -rf apps/*/*/build kermit_upload disassembly .build_helper testcases/*/*/build
+	@rm -rf apps/*/*/build kermit_upload disassembly .build_helper
 	@echo Removing build and debug files...
 
 
 modistarc_bcc1:
 #BCC1 Tests
 	@rm -f modistarc_results
-	@echo BCC1 Testcase run:
+	@echo Testcase run:
 	@echo
 	@echo First all testcases will be compiled. This may take a while!
-	@echo Note that you will have to restart the target between testcases as well as escape C-Kermit
 	@echo Make sure the target is started and the UART dongle is connected!
 	@echo
 	@read -p "Press enter to start testcases []" unused 

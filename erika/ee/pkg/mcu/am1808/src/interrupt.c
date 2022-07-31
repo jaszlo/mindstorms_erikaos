@@ -34,6 +34,16 @@ static void default_isr(void)
   for (;;) {}
 }
 
+void intctl_enable(void)
+{
+  *AINTC_GER = GER_ENABLE;
+}
+
+
+void intctl_disable(void)
+{
+  *AINTC_GER = GER_DISABLE;
+}
 /**
  * MRS instruction moves regsiter from CP15 register to CPU register.
  * In this case the CPSR (Current Programm Status Register) which contains the IRQ flag.
@@ -167,10 +177,7 @@ unsigned int irq_get_current_num(void)
     : "i" (AINTC_HIPIR2)
     :
   );
-  asm(
-      "mov     %[result], r0"
-      : [result] "=r"(inum));
-  return inum;
+  return inum & 0b1111111111; // Only lower 9th bit are for index
 }
 
 unsigned int irq_get_current_channel(void)

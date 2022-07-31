@@ -33,6 +33,7 @@ CPU test_application {
 
 	TASK Task1 {
 		PRIORITY = 0x01;  
+		SCHEDULE = FULL;
 		AUTOSTART = FALSE;
 		ACTIVATION = 1;    /* only one pending activation */
 		STACK = SHARED;
@@ -40,6 +41,7 @@ CPU test_application {
 
 	TASK Task2 {
 		PRIORITY = 0x02;  
+		SCHEDULE = FULL;
 		AUTOSTART = FALSE;
 		ACTIVATION = 1;    /* only one pending activation */
 		STACK = SHARED;

@@ -1,0 +1,47 @@
+CPU test_application {
+	OS EE {
+		EE_OPT = "__ARM9__";		 	// Wähle ARM9 CPU
+		EE_OPT = "__AM1808__";		 	// Wähle AM1808 MCU
+		EE_OPT = "__GNU__";			 	// Setze genutzen Übersetzer
+		EE_OPT = "__WD_RESET__";	 	// Gerät soll vollständig reseted werden nach durchlaufen der Anwendung
+
+		// Just to set inner values
+		CPU_DATA = CORTEX_MX {		 	// Setzten der Sourcedateien und Stackvariation, rest irrelevant.
+			MODEL = M4;
+			APP_SRC = "main.c";
+			COMPILER_TYPE = GNU;
+			MULTI_STACK = TRUE;
+			
+		};
+
+		STATUS = EXTENDED;				// Sollen System Services einen Rückgabewert haben
+										// Hookfunktionen sollen genutzt werden (hier keine)
+		STARTUPHOOK = FALSE;
+		ERRORHOOK = FALSE;
+		SHUTDOWNHOOK = FALSE;
+		PRETASKHOOK = FALSE;
+		POSTTASKHOOK = FALSE;
+		USERESSCHEDULER = FALSE;		// Nutze Scheduler nicht als Resource
+        KERNEL_TYPE = ECC1;            	// Konformitätsklasse
+		EE_OPT = "__OO_STARTOS_OLD__"; 	// No Infinity-Loop at end of StartOS
+
+	};
+	
+    TASK Task1 {
+        PRIORITY = 0x01;               	// Priorität
+        ACTIVATION = 1;                	// Anzahl erlaubter Aktivierungen
+        SCHEDULE = NON;                	// Scheduler ist preämptive
+    };
+    
+    TASK Task2 {
+        PRIORITY = 0x02;               	// Priorität
+        ACTIVATION = 1;                	// Anzahl erlaubter Aktivierungen
+        SCHEDULE = FULL;               	// Scheduler ist preämptive
+        EVENT = MyEvent;               	// Zugehörigkeit des Event
+		STACK = PRIVATE {			   	// Extended Tasks benötigen eigenen Stack
+			SYS_SIZE = 1024;
+		};
+    };
+
+    EVENT MyEvent  { MASK = AUTO; };
+};

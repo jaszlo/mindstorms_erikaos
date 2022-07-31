@@ -48,14 +48,14 @@ Ready task with highest priority is executed (Rescheduling).
 int main(void)
 {
   const unsigned int channel = 2;
-  const unsigned int period = 0x200000; 
+  const unsigned int period = 1000; // milliseconds 
   EE_timer_init(period, channel);
   EE_timer_start();
   
   ActivateTask(Task1);
   
   unsigned int result = EE_assert_range(0, 1, ASSERTIONS-1);
-  EE_assert_summarize("BCC2 Modistarc Interrupt Processing (12)", result, ASSERTIONS);
+  EE_assert_summarize("ECC1 Modistarc Interrupt Processing (12)", result, ASSERTIONS);
 
   return 0;
 }

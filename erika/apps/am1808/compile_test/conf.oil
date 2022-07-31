@@ -5,7 +5,6 @@ CPU test_application {
 		EE_OPT = "__ARM9__";
 		EE_OPT = "__AM1808__";
 		EE_OPT = "__MINDSTORM__";
-		EE_OPT = "__GNU__";
 		EE_OPT = "__WD_RESET__";
 
 		// Just to set inner values
@@ -34,7 +33,6 @@ CPU test_application {
 	/* this is the OIL part for the task */
 	TASK Task1 {
 		PRIORITY = 0x01;   /* Low priority */
-		AUTOSTART = TRUE;
 		ACTIVATION = 1;    /* only one pending activation */
 		STACK = SHARED;
 	};

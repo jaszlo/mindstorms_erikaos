@@ -1,5 +1,5 @@
 # Hello world on Mindstorm but better!
-The files in this folder will allow to run a simple hello world on the Mindstorm via a UART serial port.
+The files in this folder will allow to run a simple hello world on the Mindstorm via a UART.
 But also allow a more complex file structure for development as well as easier deployment using kermit
 
 ## Setup and execution
@@ -11,17 +11,16 @@ Those can be installed (on Ubuntu) as follows.
 chmod u+x configure.sh && ./configure.sh
 ```
 
-In addition some hand on changes are required in the `kermit_upload_stub` as well as in the `Makefile`.
-First of all you need to specify the line of the serial port if it differs on your machine.
-Also you need to make sure you are allowed to acces that line.
+In addition some hand on changes might be required in the `kermit_upload_stub` as well as in the `Makefile`.
+You need to specify the line of the serial port if it differs on your machine.
+Also you need to make sure you are have acces to that line.
 
 To compile the `hello_world.c` simply run `make`. This will create the build directory with some files of which `mindstorm_app.bin` and `boot.scr` are relevant. You can change the name of your binary via the makefile variable `APP_NAME`.
 
-For easier deployment `Kermit` is used which allows us to deploy the binary using the uart serial port.
+For easier deployment `Kermit` is used which allows us to deploy the binary using the UART.
 To do so the `boot.scr` needs to be put on the sd-card **once**.
 
-That will ensure that when booting the script will wait for a binary via the serial port and load it into memory.
-Afterwards the `boot.scr` will go to the fixed entry point `start_up`. 
+That will ensure that when booting the script will wait for a binary via the serial port and load it into memory. Afterwards the `boot.scr` will go to the fixed entry point `start_up`. 
 To ensure that the function `start_up` will always have the same address. This was done by creating a new segment `start` and telling the linker at which address he should put that specific segment.
 
 In order to deploy after booting and a setup serial port use

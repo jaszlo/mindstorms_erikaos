@@ -28,7 +28,7 @@ TASK(Task1)
 
 int main(void)
 {
-  // Task 1 should Autostart
+  ActivateTask(Task1);
   put_string("\t\tSuccess!\n");
   return 0;
 }

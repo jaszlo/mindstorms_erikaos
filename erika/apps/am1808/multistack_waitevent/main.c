@@ -54,7 +54,7 @@ int main(void)
   //SetRelAlarm(Alarm1, tick_till_alarm, is_not_cyclic);
   
   // Set timer IRQ for Counter and Alarm
-  const unsigned int period = 200000;
+  const unsigned int period = 2000; // milliseconds;
   const unsigned int channel = 2;
   EE_irq_register(IRQ_NUM_T64P0_TINT34, timer_handler);
   EE_timer_init(period, channel);

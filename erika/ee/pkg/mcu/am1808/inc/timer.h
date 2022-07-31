@@ -51,7 +51,7 @@
 
 // If we want to include this into .S file do ot include functions!
 #ifndef ASM_INC
-// Initializes the timer with a given period and a IRQ channel
+// Initializes the timer with a given period (in milliseconds) and a IRQ channel
 void timer_init(unsigned int period, unsigned int channel);
 
 // Starts the timer. Periodic timer IRQ will occour.

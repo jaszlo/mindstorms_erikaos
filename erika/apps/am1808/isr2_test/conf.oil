@@ -34,6 +34,7 @@ CPU test_application {
 		PRIORITY = 0x01;  
 		AUTOSTART = FALSE;
 		ACTIVATION = 1;    /* only one pending activation */
+		SCHEDULE = FULL;
 		STACK = SHARED;
 	};
 
@@ -41,6 +42,7 @@ CPU test_application {
 		PRIORITY = 0x02;  
 		AUTOSTART = FALSE;
 		ACTIVATION = 1;    /* only one pending activation */
+		SCHEDULE = FULL;
 		STACK = SHARED;
 	};
 

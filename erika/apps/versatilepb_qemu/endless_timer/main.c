@@ -36,6 +36,7 @@ int main(void)
   EE_timer_init(period);
   EE_timer_start();
   ActivateTask(Task1);
+  put_string("reached\n");
   // Its only possible to get past Task1 by the ISR which puts Task2 in the ready-state.
   return 0;
 }

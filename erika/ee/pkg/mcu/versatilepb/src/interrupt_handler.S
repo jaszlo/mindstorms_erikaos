@@ -1,6 +1,7 @@
 // Export
 .globl irq_handler
 // Import
+.globl intctl_disable
 .globl isr_wrapper
 .globl EE_IRQ_nesting_level
 .globl EE_arm9_after_IRQ_schedule
@@ -45,6 +46,10 @@ irq_handler:
   LDR	      r1, [r0]
   SUB	      r1, r1, #1
   STR	      r1, [r0]     
+
+  BL      intctl_disable     // Disable interrupts until preemptive scheduling call is reached
+                            // Respective enable call in
+                            // cpu/arm9/ee_irqsched.S 
 
   // Restore Context
   LDMFD     r13!, {r0-r3, r12, lr}

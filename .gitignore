@@ -74,8 +74,8 @@ hello_world_v2.0/kermit_upload
 # ErikaOS applications
 erika/apps/*/*/build
 erika/testcases/*/*/build
+erika/thesis_examples/*/build/
 
-erika/modistarc_results
 erika/kermit_upload
 erika/.build_helper
 erika/.gdb_helper

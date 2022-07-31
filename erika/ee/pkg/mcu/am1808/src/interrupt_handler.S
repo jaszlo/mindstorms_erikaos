@@ -3,6 +3,7 @@
 
 // Export
 .globl irq_handler
+.globl intctl_disable
 // Import
 .globl EE_IRQ_nesting_level;
 .globl EE_arm9_after_IRQ_schedule
@@ -54,6 +55,9 @@ irq_handler:
   SUB	r1, r1, #1
   STR	r1, [r0]     
 
+  BL      intctl_disable      // Disable interrupts until preemptive scheduling call is reached
+                              // Respective enable call in
+                              // cpu/arm9/ee_irqsched.S 
   // Restore Context
   LDMFD    r13!, {r0-r3, r12, lr}
   
@@ -63,5 +67,5 @@ irq_handler:
   LDR lr, =EE_arm9_after_IRQ_schedule
 
   // Note that the S in sub(S) flag toggle the IRQ bit in the CPSR register enabling IRQ atomtically
-  // @Source: https://developer.arm.com/documentation/dui0489/i/arm-and-thumb-instructions/subs-pc--lr?lang=en  
+  // @Source: https://developer.arm.com/documentation/dui0489/i/arm-and-thumb-instructions/subs-pc--lr?lang=en   
   SUBS     pc, lr, #0x0

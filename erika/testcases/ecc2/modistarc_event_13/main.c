@@ -46,7 +46,7 @@ int main(void)
 {
 
   const unsigned int channel = 2;
-  const unsigned int period = 0x100000; 
+  const unsigned int period = 1000; 
 
   EE_timer_init(period, channel);
   EE_timer_start();

@@ -7,7 +7,16 @@ void timer_init(unsigned int p, unsigned int channel)
 {
   irq_set_channel(IRQ_NUM_T64P0_TINT34, channel);
   irq_enable_num(IRQ_NUM_T64P0_TINT34);
-  period = p;
+  // Convert milliseconds to period
+  // Internal clock of Timer is driven by OSCIN with 24 MHz = 16 * 1500kHz
+  // The value of the prescaler is 0b1111 i.e. 16
+  // The tick rate with the prescaler is 1500 kHz = 1 / 1500 ms
+  // The period is given in milliseconds.
+  // To convert given milliseconds into tick frequence multiply given value by 1500
+  
+  // @Source https://www.ti.com/lit/ug/spruh82c/spruh82c.pdf#page=132 for OSCIN
+  // @Source Hardwareschematics of EV3 Mindstorm for 24 MHz
+  period = p * 1500; 
 }
 
 void timer_start()
@@ -19,6 +28,8 @@ void timer_start()
   *TIMER0_TGCR |= TIMMODE_UNCHAINED;  // (5) Set dual 32 bit unchained mode
   *TIMER0_TGCR |= TIM34RS_REMOVE;     // (6) Remove timer from reset
   *TIMER0_PRD34 = period;             // (7) Set timer period
+
+
   *TIMER0_TGCR &= ~(PSC34_VALUE);     // (8) Reset prescaler
   *TIMER0_TGCR |= PSC34_VALUE;        // (9) Set prescaler
 

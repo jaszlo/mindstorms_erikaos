@@ -5,7 +5,6 @@ static void default_isr(void)
   return;
 }
 
-#include "cpu/arm9/inc/ee_io.h"
 void (*TIMER_ISR_PTR)(void) = default_isr;
 
 void isr_wrapper(void) 
@@ -32,12 +31,26 @@ void irq_enable_num(unsigned int num)
   *PIC_INTENABLE |= irq_bit_by_num(num);
 }
 
+// See documentation for more information.
+// This implementation is very barebone an only serves the purpose of handling the timer interrupt
+// Vectorization is not being used! 
+// @Source https://documentation-service.arm.com/static/5e8e3604fd977155116a8e89 
 void PL190_init (void)
 {
   *PIC_INTENABLE |= 2; // unmask interrupt bit for software interrupt
   *PIC_INTENABLE |= irq_bit_by_num(IRQ_NUM_TIMER); // enable timer irq
 }
 
+
+void intctl_enable(void)
+{
+  *PIC_INTENABLE |= 2;
+}
+
+void intctl_disable(void)
+{
+  *PIC_INTENABLE &= ~2;
+}
 
 unsigned int irq_status(void)
 {

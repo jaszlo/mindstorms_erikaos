@@ -40,6 +40,11 @@ void irq_disable_num(unsigned int num);
 // Not for external use. Implemented in arm9_interrupt_hannndler.S
 void irq_handler(void);
 
+// Disable interrupts at the PL190
+void intctl_enable(void);
+
+// Enable interrupts at the PL190
+void intctl_disable(void);
 
 #define NUM_INTERRUPTS 1
 

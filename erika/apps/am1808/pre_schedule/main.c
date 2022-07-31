@@ -56,7 +56,7 @@ int main(void)
   // IRQ and ErikaOS are initialized in start_up function in ee_init.c
   // Timer IRQ setup and general setup
   const unsigned int channel = 2;
-  const unsigned int period = 500000; 
+  const unsigned int period = 1000; // milliseconds 
 
   EE_timer_init(period, channel);
   EE_timer_start();

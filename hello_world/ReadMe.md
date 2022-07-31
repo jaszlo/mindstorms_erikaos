@@ -1,5 +1,5 @@
 # Hello world on Mindstorm
-The files in this folder will allow to run a simple hello world on the Mindstorm via a UART serial port.
+The files in this folder will allow to run a simple hello world on the Mindstorm via a UART.
 
 ## Setup
 Requires sensor port 1 to be used as a a serial port. How this is done is explained [here](https://botbench.com/blog/2013/08/15/ev3-creating-console-cable/)

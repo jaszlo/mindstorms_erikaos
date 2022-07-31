@@ -73,7 +73,7 @@ int main(void)
 {
   
   const unsigned int channel = 2;
-  const unsigned int period = 0x500000; 
+  const unsigned int period = 3000; 
   EE_timer_init(period, channel);
   
   ActivateTask(Task1);

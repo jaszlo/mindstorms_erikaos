@@ -13,6 +13,7 @@ extern int main();
 
 void reboot(void);
 
+void fiq_handler(void)            { put_string("FIQ HANDLER"); for(;;); }
 void undef_handler(void)          { put_string("UNDEF EXCEPTION\n");for (;;); }
 void swi_handler(void)            { put_string("SWI EXCEPTION\n");for (;;); }
 void prefetch_abort_handler(void) { put_string("PREFETCH ABORT EXCEPTION\n");for (;;); }
