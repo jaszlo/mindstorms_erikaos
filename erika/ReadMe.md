@@ -4,7 +4,6 @@
 | Folder name  | Contains                                                                                                                     |
 |--------------|------------------------------------------------------------------------------------------------------------------------------|
 | apps         | Test application created during the development process of ther ErikaOS Arm9 Port for both `AM1808` and `versatilepb` (qemu) MCU |
-| comp         | A folder showcasing an error with RT-Druid to not generate information about the preemptibility of tasks                     |
 | dissassembly | Will be generated when building an application an contain disassembly of code and all section as well as a map file          |
 | ee           | Source and build files for ErikaOS                                                                                           |
 | testcase     | Testcases used by ErikaOS to validate a port. Contains some selected and imported MODISTARC testcases                        |
